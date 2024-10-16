@@ -1,0 +1,48 @@
+@HostAddress = http://localhost:5053
+
+###
+
+# with-headers : valid
+GET {{HostAddress}}/with-headers/
+Accept: application/json
+x-required: value
+x-required-int-with-range: 5
+
+###
+
+# with-headers : valid with optional
+GET {{HostAddress}}/with-headers/
+Accept: application/json
+x-required: value
+x-optional: value
+x-required-int-with-range: 5
+x-optional-int-with-range: 9
+
+###
+
+# with-headers : missing required
+GET {{HostAddress}}/with-headers/
+Accept: application/json
+x-optional: value
+x-required-int-with-range: 5
+x-optional-int-with-range: 9
+
+###
+
+# with-headers : missing both required
+GET {{HostAddress}}/with-headers/
+Accept: application/json
+x-optional: value
+x-optional-int-with-range: 9
+
+###
+
+# with-headers : out of range
+GET {{HostAddress}}/with-headers/
+Accept: application/json
+x-required: value
+x-optional: value
+x-required-int-with-range: 0
+x-optional-int-with-range: 1
+
+###
