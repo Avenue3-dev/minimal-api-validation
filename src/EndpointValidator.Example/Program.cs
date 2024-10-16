@@ -1,17 +1,28 @@
+using EndpointValidator;
+using EndpointValidator.Example.Endpoints;
+
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddEndpointsApiExplorer();
+builder
+    .Services
+    .AddEndpointsApiExplorer()
+    .AddEndpointValidation<Program>(options =>
+    {
+        options.FallbackToDataAnnotations = true;
+    });
 
 var app = builder.Build();
 
-app.UseHttpsRedirection();
+app
+    .UseHttpsRedirection()
+    .UseEndpointValidation()
+    .RegisterEndpoints();
 
-app.MapGet("/test", () =>
-    {
-        return TypedResults.Ok(new
-        {
-            status = "test ok",
-        });
-    });
+app.MapGet("/test", () => new {status = "test ok"});
 
 app.Run();
+
+namespace EndpointValidator.Example
+{
+    public class Program;
+}

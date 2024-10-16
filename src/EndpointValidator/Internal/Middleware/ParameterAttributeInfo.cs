@@ -1,8 +1,7 @@
-namespace EndpointValidator.Internal;
+namespace EndpointValidator.Internal.Middleware;
 
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.Mvc;
 
 internal record ParameterAttributeInfo
@@ -32,11 +31,11 @@ internal record ParameterAttributeInfo
 
         UnderlyingType = Nullable.GetUnderlyingType(parameter.ParameterType);
 
-        IsNullable = attributes.Any(x => x is NullableAttribute) || UnderlyingType is not null;
+        IsNullable = new NullabilityInfoContext().Create(parameter).ReadState is NullabilityState.Nullable;
 
         ValidationAttributes = attributes
             .Where(x => x.GetType().IsSubclassOf(typeof(ValidationAttribute)))
-            .Select(x => (ValidationAttribute) x)
+            .Select(x => (ValidationAttribute)x)
             .ToList();
     }
 
