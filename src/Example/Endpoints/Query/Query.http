@@ -1,0 +1,40 @@
+@HostAddress = http://localhost:5053
+
+###
+
+# with-query-string : 200 OK - valid
+GET {{HostAddress}}/with-query-string/
+    ?requiredString=value
+    &requiredRangedInt=1 
+Accept: application/json
+
+###
+
+# with-query-string : 200 OK - valid with optional
+GET {{HostAddress}}/with-query-string/
+    ?requiredString=value
+    &optionalRangedInt=optional
+    &requiredRangedInt=1
+    &optionalRangedInt=6
+Accept: application/json
+
+###
+
+# with-query-string : 400 BAD REQUEST  - missing required
+GET {{HostAddress}}/with-query-string/
+    ?requiredString=value
+Accept: application/json
+
+###
+
+# with-query-string : 400 BAD REQUEST  - missing all required
+GET {{HostAddress}}/with-query-string/
+Accept: application/json
+
+###
+
+# with-headers : 400 BAD REQUEST  - out of range
+GET {{HostAddress}}/with-headers/
+    ?requiredString=value
+    &requiredRangedInt=0
+Accept: application/json

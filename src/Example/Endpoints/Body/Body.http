@@ -1,0 +1,69 @@
+@HostAddress = http://localhost:5053
+
+# with-body : 200 OK - valid
+POST {{HostAddress}}/with-body/
+Accept: application/json
+Content-Type: application/json
+
+{
+    "name": "value",
+    "age": 32
+}
+
+###
+
+# with-body : 400 BAD REQUEST - missing name
+POST {{HostAddress}}/with-body/
+Accept: application/json
+Content-Type: application/json
+
+{
+    "age": 32
+}
+
+###
+
+# with-body : 400 BAD REQUEST  - missing age
+POST {{HostAddress}}/with-body/
+Accept: application/json
+Content-Type: application/json
+
+{
+    "name": "value"
+}
+
+###
+
+# with-body : 400 BAD REQUEST  - invalid name
+POST {{HostAddress}}/with-body/
+Accept: application/json
+Content-Type: application/json
+
+{
+    "name": "",
+    "age": 32
+}
+
+###
+
+# with-body : 400 BAD REQUEST  - invalid age
+POST {{HostAddress}}/with-body/
+Accept: application/json
+Content-Type: application/json
+
+{
+    "name": "value",
+    "age": 0
+}
+
+###
+
+# with-body : 400 BAD REQUEST  - invalid name & age
+POST {{HostAddress}}/with-body/
+Accept: application/json
+Content-Type: application/json
+
+{
+  "name": "",
+  "age": 0
+}
