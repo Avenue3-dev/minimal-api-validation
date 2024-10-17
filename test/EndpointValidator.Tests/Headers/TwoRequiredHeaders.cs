@@ -17,7 +17,7 @@ public class TwoRequiredHeaders : TestBase
     {
         app.MapGet(Path, (
             [FromHeader(Name = "x-required-1")] string header1,
-            [FromHeader(Name = "x-required-2")] int header2
+            [FromHeader] int header2
             ) => TypedResults.Ok());
     }
 
@@ -33,7 +33,7 @@ public class TwoRequiredHeaders : TestBase
             requestUri: Path
         );
         request.Headers.TryAddWithoutValidation("x-required-1", header1);
-        request.Headers.TryAddWithoutValidation("x-required-2", header2.ToString());
+        request.Headers.TryAddWithoutValidation("header2", header2.ToString());
 
         // Act
         var response = await Client.SendAsync(request);
@@ -50,7 +50,7 @@ public class TwoRequiredHeaders : TestBase
             method: HttpMethod.Get,
             requestUri: Path
         );
-        request.Headers.TryAddWithoutValidation("x-required-2", "123");
+        request.Headers.TryAddWithoutValidation("header2", "123");
 
         // Act
         var response = await Client.SendAsync(request);
@@ -73,7 +73,7 @@ public class TwoRequiredHeaders : TestBase
         var response = await Client.SendAsync(request);
 
         // Assert
-        await response.EnsureErrorFor("x-required-2");
+        await response.EnsureErrorFor("header2");
     }
 
     [Fact]
@@ -89,6 +89,6 @@ public class TwoRequiredHeaders : TestBase
         var response = await Client.SendAsync(request);
 
         // Assert
-        await response.EnsureErrorFor("x-required-1", "x-required-2");
+        await response.EnsureErrorFor("x-required-1", "header2");
     }
 }
