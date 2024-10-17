@@ -1,0 +1,53 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <OutputType>library</OutputType>
+    <IsPackable>true</IsPackable>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+
+    <!--  nuget details  -->
+    <PackageId>A3.MinimalApiValidation</PackageId>
+    <PackageVersion>1.0.0-beta</PackageVersion>
+    <PackageIcon>avenue3-logo.png</PackageIcon>
+    <Authors>Avenue3-dev</Authors>
+    <Copyright>Avenue3 Ltd</Copyright>
+    <PackageProjectUrl>https://github.com/Avenue3-dev/minimal-api-validation</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/Avenue3-dev/minimal-api-validation</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <Description>
+      Middleware to automatically validate headers, query parameters, and the request body using FluentValidation and ValidationAttributes in minimal api endpoints.
+    </Description>
+    <PackageTags>
+      validator;
+      validation;
+      minimal;
+      api;
+      FluentValidation;
+    </PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="EndpointValidator.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="11.10.0" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.10.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="$(SolutionDir)/LICENSE" Pack="true" PackagePath="\" />
+    <None Include="$(SolutionDir)/README.md" Pack="true" PackagePath="\" />
+    <None Include="$(SolutionDir)/images/avenue3-logo.png" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+</Project>
