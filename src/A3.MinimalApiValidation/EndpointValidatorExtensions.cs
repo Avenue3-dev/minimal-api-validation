@@ -55,6 +55,7 @@ public static class EndpointValidationExtensions
         services
             .AddSingleton(options)
             .AddTransient<ValidationMiddleware>()
+            .AddHttpContextAccessor()
             ;
 
         return services;

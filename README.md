@@ -144,7 +144,7 @@ app.MapGet("/test-header", ([FromHeader, MinLength(1)] string header) => new { h
 [FromHeader(Name = "x-test")] int? testHeader
 
 // header is required and must be between 1 and 5 inclusive
-[FromHeader(Name = "x-test"), Rnage(1, 5)] int testHeader
+[FromHeader(Name = "x-test"), Range(1, 5)] int testHeader
 
 // header is optional, but if supplied, it must be between 1 and 5 inclusive
 [FromHeader(Name = "x-test"), Range(1, 5)] int? testHeader
@@ -242,9 +242,9 @@ app.MapPost("/test-body", ([FromBody] TestRecord[] tests) => test)
     .Validate<TestRecord>();
 ```
 
-### Validation Attributes
+## Validation Attributes
 
-You can use any `ValidationAttribute` to validate headers, query parameters. This means you can use any of the built-in attributes or create your own custom attributes:
+You can use any `ValidationAttribute` to validate headers, query parameters, or body parameter (with the correct configuration). This means you can use any of the built-in attributes or create your own custom attributes, for example:
 
 ```csharp
 [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Property)]
@@ -272,11 +272,15 @@ public sealed class MinAttribute : ValidationAttribute
 // header is required and must be greater than or equal to 1
 [FromHeader(Name = "x-test"), Min(1)] int testHeader
 
-// query parameter is required and must be greater than or equal to 1
-[FromQuery, Min(1)] int page
+// query parameter is optional, but must be greater than or equal to 1 when provided
+[FromQuery, Min(1)] int? page
 ```
 
-### Validation Results
+### Custom Validation Attributes
+
+This package contains a number of custom validation attributes. You can find the available attributes and documentation in the GitHub repo docs folder.
+
+## Validation Results
 
 If validation fails, a `ValidationProblem` result is returned which produces a `400 Bad Request` response with a `HttpValidationProblemDetails` JSON payload. The payload contains a dictionary of errors where the key is the argument name and the value is a list of validation errors:
 
