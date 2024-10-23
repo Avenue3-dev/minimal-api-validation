@@ -77,7 +77,6 @@ internal static class Utils
     {
         if (!typeof(IEnumerable).IsAssignableFrom(type))
         {
-            // anything IEnumerable<T> *must* be IEnumerable
             firstUnderlyingType = null;
             return false;
         }
