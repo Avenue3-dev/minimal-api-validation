@@ -5,8 +5,6 @@ using System.Reflection;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 
 internal class ValidationMiddleware : IMiddleware
 {
@@ -15,25 +13,30 @@ internal class ValidationMiddleware : IMiddleware
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
         var options = context.RequestServices.GetService<EndpointValidatorOptions>()
-            ?? Utils.DefaultOptions;
+            ?? EndpointValidatorOptions.Default;
 
-        var logger = (context.RequestServices.GetService<ILoggerFactory>() ?? NullLoggerFactory.Instance)
-            .CreateLogger(options.LoggerCategoryName);
+        if (options.PreferExplicitRequestBodyValidation)
+        {
+            await next(context);
+            return;
+        }
+
+        var logger = context.GetLogger<ValidationMiddleware>();
 
         var endpoint = context.GetEndpoint();
         if (endpoint is null)
         {
-            logger.LogDebug("No endpoint found.");
+            logger.Debug_NoEndpointFound();
 
             await next(context);
             return;
         }
 
-        logger.LogDebug("Endpoint: {EndpointDisplayName}.", endpoint.DisplayName ?? "[NO DISPLAY NAME]");
+        logger.Info_EndpointDetails(endpoint.DisplayName ?? "[NO DISPLAY NAME]");
 
         if (!EndpointParameterCache.TryGetValue(endpoint.DisplayName ?? "", out var args))
         {
-            logger.LogDebug("Reading endpoint metadata.");
+            logger.Debug_ReadingEndpointMetadata();
 
             args = endpoint.Metadata
                 .OfType<MethodInfo>()
@@ -45,14 +48,14 @@ internal class ValidationMiddleware : IMiddleware
 
             if (endpoint.DisplayName is not null)
             {
-                logger.LogDebug("Caching endpoint metadata.");
+                logger.Debug_CachingEndpointMetadata();
                 EndpointParameterCache.TryAdd(endpoint.DisplayName, args);
             }
         }
 
         if (args.Length == 0)
         {
-            logger.LogDebug("No parameters found.");
+            logger.Debug_NoParametersFound();
 
             await next(context);
             return;
@@ -61,34 +64,33 @@ internal class ValidationMiddleware : IMiddleware
         var errors = new List<ValidationFailure>();
         string? detail = null;
 
-        logger.LogInformation("Validating endpoint: {EndpointDisplayName}.", endpoint.DisplayName ?? "[NO DISPLAY NAME]");
-        logger.LogDebug("Checking {numParams} parameter.", args.Length);
+        logger.Debug_CheckingParameters(args.Length);
         foreach (var arg in args)
         {
             if (arg.IsBody && !options.PreferExplicitRequestBodyValidation)
             {
-                logger.LogDebug("Handling body parameter: {name}.", arg.Name);
-                
+                logger.Debug_HandlingBodyParameter(arg.Name);
+
                 var bodyResult = await Body.HandleAsync(arg, context, options);
-                
+
                 errors.AddRange(bodyResult.Errors);
                 detail = bodyResult.Detail;
             }
             else if (arg.IsQuery)
             {
-                logger.LogDebug("Handling query parameter: {name}.", arg.Name);
+                logger.Debug_HandlingQueryParameter(arg.Name);
                 errors.AddRange(HeaderOrQuery.Handle(arg, context));
             }
             else if (arg.IsHeader)
             {
-                logger.LogDebug("Handling header parameter: {name}.", arg.Name);
+                logger.Debug_HandlingHeaderParameter(arg.Name);
                 errors.AddRange(HeaderOrQuery.Handle(arg, context));
             }
         }
 
         if (errors.Count == 0)
         {
-            logger.LogInformation("Validation passed.");
+            logger.Info_ValidationPassed();
 
             await next(context);
             return;
@@ -96,12 +98,7 @@ internal class ValidationMiddleware : IMiddleware
 
         var result = new ValidationResult(errors).ToDictionary();
 
-        logger.LogWarning(
-            "Validation failed with {numErrors} error(s):{newline}{errors}",
-            errors.Count,
-            Environment.NewLine,
-            string.Join(Environment.NewLine, errors.Select(e => $"- {e.PropertyName}: {e.ErrorMessage}"))
-        );
+        logger.Info_ValidationFailed(errors.Count, errors);
 
         await Results.ValidationProblem(result, detail: detail).ExecuteAsync(context);
     }

@@ -6,10 +6,20 @@ using System.Text.Json;
 using A3.MinimalApiValidation.Internal.Middleware;
 using FluentValidation;
 using FluentValidation.Results;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 internal static class Utils
 {
-    public static EndpointValidatorOptions DefaultOptions { get; } = new();
+    public static ILogger GetLogger<T>(this HttpContext context)
+    {
+        var logger = context.RequestServices.GetService<ILoggerFactory>()
+            ?.CreateLogger($"A3.MinimalApiValidation.{typeof(T).Name}") ?? NullLogger.Instance;
+
+        return logger;
+    }
     
     public static Task<ValidationResult> ValidateDataAnnotationsAsync(object? value, EndpointValidatorOptions options)
     {

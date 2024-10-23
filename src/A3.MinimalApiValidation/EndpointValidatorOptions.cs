@@ -6,6 +6,11 @@ using Microsoft.Extensions.Options;
 public class EndpointValidatorOptions
 {
     /// <summary>
+    /// Gets the default options for <see cref="EndpointValidatorOptions"/>.
+    /// </summary>
+    public static EndpointValidatorOptions Default { get; } = new();
+    
+    /// <summary>
     /// If set to <c>true</c>, the validation will fallback to using DataAnnotations
     /// if no FluentValidation validators are found.
     /// <para>The default value is <c>false</c></para>
@@ -27,10 +32,4 @@ public class EndpointValidatorOptions
     /// <para>The default value is <c>false</c></para>
     /// </summary>
     public bool PreferExplicitRequestBodyValidation { get; set; }
-
-    /// <summary>
-    /// The category name for the messages produced by the logger.
-    /// <para>The default value is 'MinimalApiValidation'</para>
-    /// </summary>
-    public string LoggerCategoryName { get; set; } = "MinimalApiValidation";
 }

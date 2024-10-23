@@ -110,18 +110,6 @@ app.MapPost("/test-body", ([FromBody] TestRecord test) => test)
     .Validate<TestRecord>();
 ```
 
-#### LoggerCategoryName
-
-This sets the logger category name used by the validation middleware.
-
-```csharp
-builder.Services.AddEndpointValidation<Program>(options =>
-{
-    // the default value is "MinimalApiValidation"
-    options.LoggerCategoryName = "Custom.MinimalApiValidation.Category";
-});
-```
-
 #### JsonSerializerOptions
 
 This sets the `JsonSerializerOptions` used by the validation middleware. By default, the middleware will try to resolve the serializer options from the service collection via `Microsoft.AspNetCore.Http.Json.JsonOptions`:
