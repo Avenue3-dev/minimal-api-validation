@@ -1,0 +1,58 @@
+@HostAddress = http://localhost:5053
+
+# with-body : valid
+POST {{HostAddress}}/with-body-annotated/
+Accept: application/json
+Content-Type: application/json
+
+{
+    "name": "value",
+    "age": 32
+}
+
+###
+
+# with-body : missing name
+POST {{HostAddress}}/with-body-annotated/
+Accept: application/json
+Content-Type: application/json
+
+{
+    "age": 32
+}
+
+###
+
+# with-body : missing age
+POST {{HostAddress}}/with-body-annotated/
+Accept: application/json
+Content-Type: application/json
+
+{
+    "name": "value"
+}
+
+###
+
+# with-body : invalid name
+POST {{HostAddress}}/with-body-annotated/
+Accept: application/json
+Content-Type: application/json
+
+{
+    "name": "",
+    "age": 32
+}
+
+###
+
+# with-body : invalid age
+POST {{HostAddress}}/with-body-annotated/
+Accept: application/json
+Content-Type: application/json
+
+{
+    "name": "value",
+    "age": 0
+}
+
