@@ -19,6 +19,7 @@ public abstract class TestBase : IClassFixture<WebApplicationFactory<Program>>
                     if (RegisterValidator)
                     {
                         svc.AddSingleton<IValidator<TestRecord>, TestRecordValidator>();
+                        svc.AddSingleton<IValidator<TestRecordRenamed>, TestRecordRenamedValidator>();
                     }
                     svc.AddEndpointValidation(ConfigureOptions);
                 })

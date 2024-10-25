@@ -1,0 +1,19 @@
+@HostAddress = http://localhost:5053
+
+###
+
+# with-query-model : 200 OK - valid
+GET {{HostAddress}}/with-query-model/
+    ?name=bilbo
+    &age=111
+    &other=abc
+Accept: application/json
+
+###
+
+# with-query-model : 400 BAD REQUEST - age out of range
+GET {{HostAddress}}/with-query-model/
+    ?name=bilbo
+    &age=200
+    &other=abc
+Accept: application/json

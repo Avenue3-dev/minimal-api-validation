@@ -18,8 +18,8 @@ internal static partial class LogMessages
 
     // debug
 
-    [LoggerMessage(LogLevel.Debug, "Validating single model of type {TypeName}", EventId = 0)]
-    internal static partial void Debug_ValidatingSingleModel(this ILogger logger, string typeName);
+    [LoggerMessage(LogLevel.Debug, "Validating model of type {TypeName}", EventId = 0)]
+    internal static partial void Debug_ValidatingModel(this ILogger logger, string typeName);
 
     [LoggerMessage(LogLevel.Debug, "Validating models array of type {TypeName}", EventId = 0)]
     internal static partial void Debug_ValidatingModelsArray(this ILogger logger, string typeName);

@@ -5,9 +5,6 @@ using System.Text;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Json;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 
 internal static class Body
 {
@@ -28,9 +25,7 @@ internal static class Body
             return new ValidationFailure("body", "A body is required but was null or empty.");
         }
 
-        var jsonOptions = options.JsonSerializerOptions
-            ?? context.RequestServices.GetService<JsonOptions>()?.SerializerOptions
-            ?? context.RequestServices.GetService<IOptions<JsonOptions>>()?.Value.SerializerOptions;
+        var jsonOptions = context.GetJsonOptions();
 
         if (!Utils.TryDeserialize(json, arg.ParameterType, jsonOptions, out var value, out var errors))
         {

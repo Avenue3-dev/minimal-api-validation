@@ -7,9 +7,11 @@ using A3.MinimalApiValidation.Internal.Middleware;
 using FluentValidation;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Json;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 
 internal static class Utils
 {
@@ -20,7 +22,37 @@ internal static class Utils
 
         return logger;
     }
-    
+
+    public static JsonSerializerOptions GetJsonOptions(this HttpContext context)
+    {
+        var jsonOptions = context.RequestServices.GetService<EndpointValidatorOptions>()
+                ?.JsonSerializerOptions
+            ?? context.RequestServices.GetService<JsonOptions>()?.SerializerOptions
+            ?? context.RequestServices.GetService<IOptions<JsonOptions>>()?.Value.SerializerOptions
+            ?? new JsonSerializerOptions();
+
+        return jsonOptions;
+    }
+
+    public static int Bit(this bool value) => value ? 1 : 0;
+
+    public static bool IsMultiple(bool first, params bool[] others) => first.Bit() + others.Sum(Bit) > 1;
+
+    public static string Serialize<T>(this T? value, JsonSerializerOptions? options)
+    {
+        return JsonSerializer.Serialize(value, options);
+    }
+
+    public static T? Deserialize<T>(this string json, JsonSerializerOptions? options)
+    {
+        return JsonSerializer.Deserialize<T>(json, options);
+    }
+
+    public static object? Deserialize(this string json, Type type, JsonSerializerOptions? options)
+    {
+        return JsonSerializer.Deserialize(json, type, options);
+    }
+
     public static Task<ValidationResult> ValidateDataAnnotationsAsync(object? value, EndpointValidatorOptions options)
     {
         return Task.FromResult(ValidateDataAnnotations(value, options));
@@ -61,7 +93,7 @@ internal static class Utils
 
         try
         {
-            value = JsonSerializer.Deserialize(json, type, options);
+            value = json.Deserialize(type, options);
             return true;
         }
         catch (Exception ex) when (ex is not ValidationException)

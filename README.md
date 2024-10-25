@@ -7,6 +7,7 @@ Easily add validation to your ASP.NET Core Minimal API endpoints to validate inc
 - Use `[FromBody]` to automatically validate arguments using any registered `FluentValidation` validator.
 - Use `[FromHeader]` in combination with any `ValidationAttribute` to automatically validate header arguments.
 - Use `[FromQuery]` in combination with any `ValidationAttribute` to automatically validate header query parameters.
+- Use custom `FromQuery<T>` to automatically bind and validate a group of dependent query parameters.
 
 ## Installation
 
@@ -173,6 +174,33 @@ app.MapGet("/test-query", ([FromQuery, Range(1, 5)] int page) => new { page });
 // query parameter is optional, but if supplied, it must be at no more than 20 characters long
 [FromQuery, MaxLength(20)] string? page
 ```
+
+#### Map multiple query parameters to a single object
+
+You can also map multiple query parameters to a single object using the `FromQuery<T>` binder. This allows you to bind and validate a group of dependent query parameters:
+
+```csharp
+// query parameters are matched to the given object and validated automatically based on any registered FluentValidation validator
+app.MapGet("/test-query-model", (FromQuery<TestRecord> test) => test);
+
+public record TestRecord(string Name, bool HasCake, bool HasEatenIt);
+
+public class TestRecordValidator : AbstractValidator<TestRecord>
+{
+    public TestRecordValidator()
+    {
+        RuleFor(x => x.Name).NotEmpty();
+        RuleFor(x => x)
+            .Must(x => x is not {HasCake: true, HasEatenIt: true})
+            .WithMessage("You can't have your cake and eat it too!");
+    }
+}
+
+// query parameters
+GET /test-query-model?name=John&hasCake=true&hasEatenIt=false
+```
+
+> You can also use the same validation options as with `FromBody` (see below), including using DataAnnotations instead of FluentValidation, and explicit validation rather than automatic validation.
 
 ### Request Body
 
