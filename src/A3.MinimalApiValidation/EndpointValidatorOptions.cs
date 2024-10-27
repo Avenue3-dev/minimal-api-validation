@@ -24,7 +24,7 @@ public class EndpointValidatorOptions
     /// followed by <see cref="IOptions{TOptions}"/>.
     /// <para>The default value is <c>null</c></para> 
     /// </summary>
-    public System.Text.Json.JsonSerializerOptions? JsonSerializerOptions { get; set; } = null;
+    public System.Text.Json.JsonSerializerOptions? JsonSerializerOptions { get; set; }
 
     /// <summary>
     /// If set to <c>true</c>, request body validation will only be performed if
