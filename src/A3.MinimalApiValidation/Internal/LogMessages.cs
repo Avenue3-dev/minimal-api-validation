@@ -13,7 +13,7 @@ internal static partial class LogMessages
     [LoggerMessage(LogLevel.Information, "Validation passed.", EventId = 0)]
     internal static partial void Info_ValidationPassed(this ILogger logger);
 
-    [LoggerMessage(LogLevel.Information, "Validation failed with {ErrorCount} error(s):\n{@Errors}", EventId = 0)]
+    [LoggerMessage(LogLevel.Information, "Validation failed with {ErrorCount} error(s):{@Errors}", EventId = 0)]
     internal static partial void Info_ValidationFailed(this ILogger logger, int errorCount, IEnumerable<ValidationFailure> errors);
 
     // debug
