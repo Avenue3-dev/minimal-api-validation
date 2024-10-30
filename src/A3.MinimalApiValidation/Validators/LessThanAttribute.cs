@@ -68,7 +68,7 @@ public sealed class LessThanAttribute : ValidationAttribute
         {
             var httpContext = validationContext.GetService<IHttpContextAccessor>()?.HttpContext;
             var otherProperty = validationContext.ObjectType.GetRuntimeProperty(OtherPropertyName);
-            
+
             var otherPropertyValue = otherProperty is not null
                 ? otherProperty.GetValue(validationContext.ObjectInstance, null)
                 : httpContext?.Request.Query[OtherPropertyName].FirstOrDefault()
