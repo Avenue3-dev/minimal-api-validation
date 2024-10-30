@@ -1,5 +1,6 @@
 namespace A3.MinimalApiValidation.Internal.Middleware;
 
+using System.ComponentModel.DataAnnotations;
 using FluentValidation.Results;
 using Microsoft.AspNetCore.Http;
 
@@ -36,9 +37,11 @@ internal static class HeaderOrQuery
         var castValue = arg.UnderlyingType is not null
             ? Convert.ChangeType(value, arg.UnderlyingType)
             : Convert.ChangeType(value, arg.ParameterType);
+        
+        var validationContext = new ValidationContext(castValue, context.RequestServices, items: null);
 
         var errors = arg.ValidationAttributes
-            .Where(x => !x.IsValid(castValue))
+            .Where(x => x.GetValidationResult(castValue, validationContext) is not null)
             .Select(x => new ValidationFailure(arg.Name, x.FormatErrorMessage(arg.Name)))
             .ToList();
 
