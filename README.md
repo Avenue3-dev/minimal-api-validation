@@ -278,7 +278,7 @@ public sealed class MinAttribute : ValidationAttribute
 
 ### Custom Validation Attributes
 
-This package contains a number of custom validation attributes. You can find the available attributes and documentation in the GitHub repo docs folder.
+This package contains a number of custom validation attributes. You can find the available attributes and documentation in the GitHub repo [docs](https://github.com/Avenue3-dev/minimal-api-validation/tree/main/docs/validation-attributes) folder.
 
 ## Validation Results
 
