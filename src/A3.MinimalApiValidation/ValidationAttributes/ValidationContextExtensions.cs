@@ -38,23 +38,20 @@ internal static class ValidationContextExtensions
     public static object? GetOtherPropertyValue(this ValidationContext context, string propertyName)
     {
         // try get other property from current object
-        var otherPropertyValue = context
+        var otherProperty = context
             .ObjectType
-            .GetRuntimeProperty(propertyName)
-            ?.GetValue(context.ObjectInstance, null);
+            .GetRuntimeProperty(propertyName);
 
-        if (otherPropertyValue is not null)
+        if (otherProperty is not null)
         {
-            return otherPropertyValue;
+            return otherProperty.GetValue(context.ObjectInstance, null);
         }
 
         // otherwise, try get the other property from query or header
         var httpContext = context.GetService<IHttpContextAccessor>()?.HttpContext;
 
-        otherPropertyValue =
+        return
             httpContext?.Request.Query[propertyName].FirstOrDefault()
             ?? httpContext?.Request.Headers[propertyName].FirstOrDefault();
-
-        return otherPropertyValue;
     }
 }
