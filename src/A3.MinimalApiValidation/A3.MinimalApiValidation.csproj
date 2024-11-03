@@ -6,7 +6,6 @@
     <Nullable>enable</Nullable>
     <OutputType>library</OutputType>
     <IsPackable>true</IsPackable>
-    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 
     <!--  nuget details  -->
     <PackageId>A3.MinimalApiValidation</PackageId>
@@ -20,7 +19,8 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <Description>
-      Middleware to automatically validate headers, query parameters, and the request body using FluentValidation and ValidationAttributes in minimal api endpoints.
+      Middleware to automatically validate headers, query parameters, and the request body using
+      FluentValidation and ValidationAttributes in minimal api endpoints.
     </Description>
     <PackageTags>
       validator;
@@ -43,7 +43,7 @@
   <ItemGroup>
     <None Include="$(SolutionDir)/LICENSE" Pack="true" PackagePath="\" />
     <None Include="$(SolutionDir)/README.md" Pack="true" PackagePath="\" />
-    <None Include="$(SolutionDir)/images/avenue3-logo.png" Pack="true" PackagePath="\" />
+    <None Include="$(SolutionDir)/assets/avenue3-logo.png" Pack="true" PackagePath="\" />
   </ItemGroup>
 
 </Project>

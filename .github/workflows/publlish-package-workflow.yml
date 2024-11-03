@@ -1,0 +1,57 @@
+name: publish-orchid-pre-release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        type: string
+        required: true
+        description: The release version number
+
+jobs:
+  create_pre_release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for existing tag
+        shell: bash {0}
+        run: |
+          VERSION=${{ github.event.inputs.version }}
+          if [ $(git --no-pager tag -l "$VERSION") ]; then
+              echo "Tag $VERSION already exists"
+              exit 1
+          fi
+          exit 0
+
+      - name: Restore
+        run: dotnet restore MinimalApiValidation.sln
+
+      - name: Build
+        run: dotnet build -c Release --no-restore MinimalApiValidation.sln
+
+      - name: Test
+        run: dotnet test -c Release --no-restore --no-build
+
+      - name: Pack
+        run: dotnet pack -p:PackageVersion=${{ github.event.inputs.version }} -c Release -o ./.nupkgs
+
+      - name: Publish
+        run: dotnet nuget push ./.nupkgs/*.nupkg \
+          --api-key ${{ secrets.NUGET_API_KEY }} \
+          --source https://api.nuget.org/v3/index.json \
+          --skip-duplicate
+
+      - name: Initialize mandatory git config
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email noreply@github.com
+
+      - name: Create and push tag
+        shell: bash {0}
+        run: |
+          git tag $VERSION
+          git push origin $VERSION
+          exit 0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
