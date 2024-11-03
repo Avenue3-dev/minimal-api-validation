@@ -2,6 +2,7 @@ namespace A3.MinimalApiValidation.Internal;
 
 using System.Collections;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Text.Json;
 using A3.MinimalApiValidation.Internal.Middleware;
 using FluentValidation;
@@ -167,4 +168,54 @@ internal static class Utils
             results,
             $"{failedIndexes.Count} items in the array failed validation, indexes: {string.Join(", ", failedIndexes)}");
     }
+
+    public static object? CastValueOrDefault(string? value, Type type)
+    {
+        var didCast = TryCastValue(value, type, out var castValue, out var defaultValue);
+        return didCast ? castValue : defaultValue;
+    }
+    
+    public static bool TryCastValue(string? value, Type type, out object? castValue, out object? defaultValue)
+    {
+        castValue = null;
+        defaultValue = null;
+
+        if (!TypeParsers.TryGetValue(type, out var parser))
+        {
+            return false;
+        }
+        
+        var (success, result, def) = parser(value);
+        defaultValue = def;
+        
+        if (success)
+        {
+            castValue = result;
+            return true;
+        }
+
+        castValue = defaultValue;
+        return false;
+    }
+    
+    private static Dictionary<Type, Func<string?, (bool, object?, object?)>> TypeParsers { get; } = new()
+    {
+        { typeof(bool), v => (bool.TryParse(v, out var result), result, false) },
+        { typeof(bool?), v => (bool.TryParse(v, out var result), result, null) },
+        { typeof(int), v => (int.TryParse(v, NumberStyles.Integer, CultureInfo.InvariantCulture, out var result), result, default(int)) },
+        { typeof(int?), v => (int.TryParse(v, NumberStyles.Integer, CultureInfo.InvariantCulture, out var result), result, null) },
+        { typeof(long), v => (long.TryParse(v, NumberStyles.Integer, CultureInfo.InvariantCulture, out var result), result, default(long)) },
+        { typeof(long?), v => (long.TryParse(v, NumberStyles.Integer, CultureInfo.InvariantCulture, out var result), result, null) },
+        { typeof(float), v => (float.TryParse(v, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out var result), result, default(float)) },
+        { typeof(float?), v => (float.TryParse(v, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out var result), result, null) },
+        { typeof(double), v => (double.TryParse(v, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out var result), result, default(double)) },
+        { typeof(double?), v => (double.TryParse(v, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out var result), result, null) },
+        { typeof(decimal), v => (decimal.TryParse(v, NumberStyles.Number, CultureInfo.InvariantCulture, out var result), result, default(decimal)) },
+        { typeof(decimal?), v => (decimal.TryParse(v, NumberStyles.Number, CultureInfo.InvariantCulture, out var result), result, null) },
+        { typeof(DateTime), v => (DateTime.TryParse(v, CultureInfo.InvariantCulture, DateTimeStyles.None, out var result), result, default(DateTime)) },
+        { typeof(DateTime?), v => (DateTime.TryParse(v, CultureInfo.InvariantCulture, DateTimeStyles.None, out var result), result, null) },
+        { typeof(Guid), v => (Guid.TryParse(v, out var result), result, default(Guid)) },
+        { typeof(Guid?), v => (Guid.TryParse(v, out var result), result, null) },
+        { typeof(string), v => (true, v, default(string)) },
+    };
 }

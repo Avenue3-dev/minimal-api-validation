@@ -52,4 +52,17 @@ public class RequiredIntQueryParam : TestBase
         // Assert
         await response.EnsureErrorFor("query");
     }
+    
+    [Theory]
+    [InlineData("not-an-int")]
+    [InlineData("123-456-789")]
+    public async Task returns_bad_request_when_required_query_param_is_not_an_int(string query)
+    {
+        // Arrange
+        // Act
+        var response = await Client.GetAsync($"{Path}?query={query}");
+
+        // Assert
+        await response.EnsureErrorFor("query");
+    }
 }

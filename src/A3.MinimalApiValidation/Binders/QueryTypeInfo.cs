@@ -3,6 +3,7 @@ namespace A3.MinimalApiValidation.Binders;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Reflection;
+using A3.MinimalApiValidation.Internal;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
@@ -132,7 +133,7 @@ internal class QueryTypeInfo
             var array = Array.CreateInstance(elementType, value.Count);
             for (var i = 0; i < value.Count; i++)
             {
-                array.SetValue(CastValue(value[i], elementType), i);
+                array.SetValue(Utils.CastValueOrDefault(value[i], elementType), i);
             }
 
             return array;
@@ -146,37 +147,12 @@ internal class QueryTypeInfo
 
             foreach (var item in value)
             {
-                list.Add(CastValue(item, elementType));
+                list.Add(Utils.CastValueOrDefault(item, elementType));
             }
 
             return list;
         }
 
-        return CastValue(value.ToString(), type);
-    }
-
-    private static object? CastValue(string? value, Type type)
-    {
-        return type switch
-        {
-            _ when type == typeof(bool) => bool.TryParse(value, out var b) && b,
-            _ when type == typeof(bool?) => bool.TryParse(value, out var b) ? b : null,
-            _ when type == typeof(int) => int.TryParse(value, out var n) ? n : 0,
-            _ when type == typeof(int?) => int.TryParse(value, out var n) ? n : null,
-            _ when type == typeof(long) => long.TryParse(value, out var n) ? n : 0,
-            _ when type == typeof(long?) => long.TryParse(value, out var n) ? n : null,
-            _ when type == typeof(float) => float.TryParse(value, out var n) ? n : 0,
-            _ when type == typeof(float?) => float.TryParse(value, out var n) ? n : null,
-            _ when type == typeof(double) => double.TryParse(value, out var n) ? n : 0,
-            _ when type == typeof(double?) => double.TryParse(value, out var n) ? n : null,
-            _ when type == typeof(decimal) => decimal.TryParse(value, out var n) ? n : 0,
-            _ when type == typeof(decimal?) => decimal.TryParse(value, out var n) ? n : null,
-            _ when type == typeof(DateTime) => DateTime.TryParse(value, out var dt) ? dt : DateTime.MinValue,
-            _ when type == typeof(DateTime?) => DateTime.TryParse(value, out var dt) ? dt : null,
-            _ when type == typeof(Guid) => Guid.TryParse(value, out var dt) ? dt : Guid.Empty,
-            _ when type == typeof(Guid?) => Guid.TryParse(value, out var dt) ? dt : null,
-            _ when type == typeof(string) => value,
-            _ => default,
-        };
+        return Utils.CastValueOrDefault(value.ToString(), type);
     }
 }

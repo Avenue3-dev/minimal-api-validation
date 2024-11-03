@@ -6,26 +6,25 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.Routing;
 
-public class OptionalIntQueryParam : TestBase
+public class OptionalGuidQueryParam : TestBase
 {
-    public OptionalIntQueryParam(WebApplicationFactory<Program> factory) : base(factory)
+    public OptionalGuidQueryParam(WebApplicationFactory<Program> factory) : base(factory)
     {
     }
 
     protected override void AddTestEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet(Path, ([FromQuery] int? query) => TypedResults.Ok());
+        app.MapGet(Path, ([FromQuery] Guid? query) => TypedResults.Ok());
     }
 
-    [Theory]
-    [InlineData(1)]
-    [InlineData(2)]
-    [InlineData(123)]
-    public async Task returns_ok_when_required_query_param_is_valid(int query)
+    [Fact]
+    public async Task returns_ok_when_required_query_param_is_valid()
     {
         // Arrange
+        var guid = Guid.NewGuid();
+        
         // Act
-        var response = await Client.GetAsync($"{Path}?query={query}");
+        var response = await Client.GetAsync($"{Path}?query={guid}");
 
         // Assert
         response.EnsureSuccessStatusCode();
@@ -52,11 +51,12 @@ public class OptionalIntQueryParam : TestBase
         // Assert
         await response.EnsureErrorFor("query");
     }
-    
+
     [Theory]
-    [InlineData("not-an-int")]
+    [InlineData("not-a-guid")]
+    [InlineData("123")]
     [InlineData("123-456-789")]
-    public async Task returns_bad_request_when_required_query_param_is_not_an_int(string query)
+    public async Task returns_bad_request_when_required_query_param_is_not_a_guid(string query)
     {
         // Arrange
         // Act

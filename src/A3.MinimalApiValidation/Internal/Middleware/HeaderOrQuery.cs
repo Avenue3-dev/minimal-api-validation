@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Http;
 
 internal static class HeaderOrQuery
 {
-    public static IReadOnlyCollection<ValidationFailure> Handle(ParameterAttributeInfo arg, HttpContext context)
+    public static IEnumerable<ValidationFailure> Handle(ParameterAttributeInfo arg, HttpContext context)
     {
         var value = arg.IsHeader
             ? context.Request.Headers[arg.Name].FirstOrDefault()
@@ -33,10 +33,18 @@ internal static class HeaderOrQuery
         {
             return [new ValidationFailure(arg.Name, message)];
         }
+        
+        var castingType = arg.UnderlyingType ?? arg.ParameterType;
+        var didCastValue = Utils.TryCastValue(value, castingType, out var castValue, out _);
 
-        var castValue = arg.UnderlyingType is not null
-            ? Convert.ChangeType(value, arg.UnderlyingType)
-            : Convert.ChangeType(value, arg.ParameterType);
+        if (!didCastValue || castValue is null)
+        {
+            var castErrors = new List<ValidationFailure>
+            {
+                new(arg.Name, $"Could not cast {arg.Name} to {castingType.Name}."),
+            };
+            return castErrors;
+        }
         
         var validationContext = new ValidationContext(castValue, context.RequestServices, items: null);
 

@@ -12,7 +12,7 @@ You can map multiple query parameters to a single object using the `FromQuery<T>
 To validate, just register a FluentValidation validator for the same type.
 
 ```csharp
-app.MapGet("/test-query-model", (FromQuery<TestRecord> test) => test);
+app.MapGet("/test-query-model", (FromQuery<TestRecord> test) => { ... });
 
 public record TestRecord(string Name, bool HasCake, bool HasEatenIt);
 
@@ -35,7 +35,7 @@ If required, you can match just a subset of query parameters:
 
 ```csharp
 // query parameters are matched to the given object and validated automatically based on any registered FluentValidation validator
-app.MapGet("/test-query-model", (FromQuery<TestRecord> test, [FromQuery] string name) => test);
+app.MapGet("/test-query-model", (FromQuery<TestRecord> test, [FromQuery] string name) => { ... });
 
 public record TestRecord(bool HasCake, bool HasEatenIt);
 
@@ -56,22 +56,46 @@ Example: `GET /test-query-model?name=John&hasCake=true&hasEatenIt=false`
 Collections are supported when providing multiple values for the same query parameter:
 
 ```csharp
-app.MapGet("/test-query-model", (FromQuery<TestRecord> test, [FromQuery] string name) => test);
+app.MapGet("/test-query-model", (FromQuery<TestRecord> test, [FromQuery] string name) => { ... });
 
 public record TestRecord(List<string> Items, int[] Ids);
 ```
 Example: `GET /test-query-model?items=apple&items=banana&ids=1&ids=2&ids=3`
+
+#### Single Collection
+
+You can also use this method if you want to bind a single collection:
+
+```csharp
+app.MapGet("/test-query-model", ([FromQuery] string name, FromQuery<IdList> Ids) => { ... });
+
+public record IdList(
+    [property: FromQuery(Name = "id")]int[] Ids
+);
+
+public class IdListValidator : AbstractValidator<IdList>
+{
+    public IdListValidator()
+    {
+        RuleForEach(x => x.Ids)
+            .GreaterThan(0)
+            .WithMessage("Each provided id must be greater than 0");
+    }
+}
+```
+
+Example: `GET /test-query-model?id=1&id=2&id=3`
 
 ### Property Binding
 
 The property binding is performed using json deserialization, therefore query parameter names can be customized using the `JsonPropertyName` attribute:
 
 ```csharp
-app.MapGet("/test-query-model", (FromQuery<TestRecord> test) => test);
+app.MapGet("/test-query-model", (FromQuery<TestRecord> test) => { ... });
 
 public record TestRecord(
-    [property: JsonPropertyName("has-cake")] bool HasCake,
-    [property: JsonPropertyName("eaten")]bool HasEatenIt
+    [property: FromQuery("has-cake")] bool HasCake,
+    [property: FromQuery("eaten")]bool HasEatenIt
 );
 ```
 
@@ -89,7 +113,7 @@ builder.Services.AddEndpointValidation<Program>(options =>
 });
 
 // the FromQuery<T> model is validated automatically using the associated DataAnnotations
-app.MapGet("/test-query-model", (FromQuery<TestRecord> test) => test);
+app.MapGet("/test-query-model", (FromQuery<TestRecord> test) => { ... });
 
 public record TestRecord
 {
@@ -119,6 +143,6 @@ builder.Services.AddEndpointValidation<Program>(options =>
 });
 
 // endpoint with explicit validation
-app.MapGet("/test-query-model", (FromQuery<TestRecord> test) => test)
+app.MapGet("/test-query-model", (FromQuery<TestRecord> test) => { ... })
     .Validate<TestRecord>();
 ```

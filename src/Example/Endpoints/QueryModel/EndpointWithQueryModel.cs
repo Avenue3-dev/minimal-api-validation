@@ -9,7 +9,7 @@ public class EndpointWithQueryModel: IEndpoint
     {
         app.MapGet("with-query-model", (
             FromQuery<MyQueryModel> data
-        ) => TypedResults.Ok(data));
+        ) => TypedResults.Ok(data.Value));
     }
 }
 
