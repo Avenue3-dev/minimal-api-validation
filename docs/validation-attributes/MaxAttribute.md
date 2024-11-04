@@ -4,7 +4,7 @@ The `MaxAttribute` validates that the value of the property is less than or equa
 
 It supports comparing `int`, `long`, `double`, `decimal`, and `float`, and `DateTime` types.
 
-## Example usage:~~~~
+## Example usage:
 
 ```csharp
 // ?query=5
@@ -22,3 +22,5 @@ public class TestModel
     public required int Item1 { get; init; }
 }
 ```
+
+> **Note:** The `MaxAttribute` performs the same validation as the `LessThanOrEqualAttribute` but excludes property comparison. Therefore this may be preferred when performance is a concern.

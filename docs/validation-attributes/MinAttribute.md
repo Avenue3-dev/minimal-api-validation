@@ -22,3 +22,5 @@ public class TestModel
     public required int Item1 { get; init; }
 }
 ```
+
+> **Note:** The `MinAttribute` performs the same validation as the `GreaterThanOrEqualAttribute` but excludes property comparison. Therefore this may be preferred when performance is a concern.

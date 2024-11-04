@@ -5,6 +5,7 @@ You can use any `ValidationAttribute` to validate headers, query parameters, or 
 This package contains a number of custom validation attributes:
 
 - [LessThan](./LessThanAttribute.md)
+- [LessThanOrEqualTo](./LessThanOrEqualToAttribute.md)
 - [GreaterThan](./GreaterThanAttribute.md)
 - [GreaterThanOrEqualTo](./GreaterThanOrEqualToAttribute.md)
 - [Min](./MinAttribute.md)
