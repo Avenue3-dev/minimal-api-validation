@@ -7,6 +7,18 @@ using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
+/// <summary>
+/// A custom route delegate binder that will map any number (or all) query parameters
+/// to the model T. The instance of T is available via the <see cref="Value"/> property. 
+/// </summary>
+/// <typeparam name="T">The object type to bind the query parameters too.</typeparam>
+/// <example lang="c#">
+/// app.MapGet("/test-query-model", (FromQuery&lt;TestModel&gt; query) =>
+/// {
+///     // access TestModel via the Value property
+///     var model = query.Value;
+/// });
+/// </example>
 public class FromQuery<T> : IRouteDelegateBinder<FromQuery<T>> where T : class
 {
     private FromQuery(T value)
