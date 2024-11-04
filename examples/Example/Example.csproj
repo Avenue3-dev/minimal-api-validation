@@ -9,11 +9,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <AssemblyAttribute Include="System.Diagnostics.CodeAnalysis.ExcludeFromCodeCoverageAttribute"/>
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="FluentValidation" Version="11.10.0"/>
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\A3.MinimalApiValidation\A3.MinimalApiValidation.csproj" />
+    <ProjectReference Include="..\..\src\A3.MinimalApiValidation\A3.MinimalApiValidation.csproj"/>
   </ItemGroup>
 
 </Project>

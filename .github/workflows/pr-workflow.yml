@@ -1,0 +1,109 @@
+name: pr-workflow
+
+on:
+  pull_request:
+    branches:
+      - "main"
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build_test:
+    name: "Build and Test"
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+
+      - name: Install Required .NET Tools
+        run: |
+          dotnet new tool-manifest
+          dotnet tool install dotnet-reportgenerator-globaltool
+          dotnet tool install dotnet-coverage
+
+      - name: Restore
+        run: dotnet restore MinimalApiValidation.sln
+
+      - name: Build
+        run: dotnet build -c Release --no-restore MinimalApiValidation.sln
+
+      - name: Test
+        run: |
+          dotnet test \
+            -c Release \
+            --no-restore \
+            --no-build \
+            --logger "trx;LogFileName=test-results.trx" \
+            --collect:"XPlat Code Coverage" \
+            --results-directory ./coverage \
+            --verbosity normal
+
+      # REPORTS
+
+      - name: Generate Test Report
+        uses: dorny/test-reporter@v1
+        if: always()
+        id: test_report
+        with:
+          name: Unit Tests Report
+          path: "**/*.trx"
+          reporter: dotnet-trx
+          fail-on-error: true
+
+      - name: Upload Test Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-report
+          path: "**/*.trx"
+
+      - name: Generate Coverage Report
+        run: |
+          dotnet reportgenerator \
+            -reports:"**/coverage/**/coverage.cobertura.xml" \
+            -targetdir:"./coverage/coveragereport" \
+            -reporttypes:"MarkdownSummaryGithub;Html" \
+            -title:"Test Coverage"
+
+      - name: Upload Code Coverage Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: "**/coverage/coveragereport"
+
+      # JOB SUMMARY
+
+      - name: Write Test Summary to Job Summary
+        run: |
+          cat << EOF > test-summary.md
+          # Summary - Unit Tests
+          | Result | Passed | Failed | Skipped |
+          |--------|--------|--------|---------|
+          | ${{ steps.test_report.outputs.conclusion }} | :green_heart: ${{ steps.test_report.outputs.passed }} | :broken_heart: ${{ steps.test_report.outputs.failed }} | :zzz: ${{ steps.test_report.outputs.skipped }} |
+          EOF
+          cat test-summary.md >> $GITHUB_STEP_SUMMARY
+
+      - name: Write Coverage to Job Summary
+        run: cat coverage/coveragereport/SummaryGithub.md >> $GITHUB_STEP_SUMMARY
+
+      # PR COMMENTS
+
+      - name: Add Test Summary PR Comment
+        uses: marocchino/sticky-pull-request-comment@v2
+        if: github.event_name == 'pull_request'
+        with:
+          header: "Test-Summary"
+          recreate: true
+          path: "**/test-summary.md"
+
+      - name: Add Coverage PR Comment
+        uses: marocchino/sticky-pull-request-comment@v2
+        if: github.event_name == 'pull_request'
+        with:
+          header: "Test-Summary"
+          path: "**/coverage/coveragereport/SummaryGithub.md"
+          append: true

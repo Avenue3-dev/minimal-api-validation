@@ -1,6 +1,6 @@
 # MinimalApiValidation
 
-// TODO: Add Badges
+[![build](https://github.com/Avenue3-dev/minimal-api-validation/actions/workflows/pr-workflow.yml/badge.svg)](https://github.com/Avenue3-dev/minimal-api-validation/actions/workflows/pr-workflow.yml) [![nuget](https://img.shields.io/nuget/v/A3.MinimalApiValidation.svg?style=flat)](https://www.nuget.org/packages/A3.MinimalApiValidation) ![license](https://img.shields.io/github/license/Avenue3-dev/eslint-config-avenue3)
 
 Easily add validation to your ASP.NET Core Minimal API endpoints to validate incoming request headers, query parameters, and the request body.
 
@@ -55,15 +55,15 @@ public class TestRecordValidator : AbstractValidator<TestRecord>
 
 To use the validation features, you need to register the validation services and options in the `WebApplicationBuilder`:
 
-> Note: <br /> If you plan to use `FluentValidation`, make sure to register your validators with the service collection, or use the `AddEndpointValidation<T>`.
+> Note: <br /> If you plan to use `FluentValidation`, make sure to register your validators with the service collection, or use `AddEndpointValidation<T>()` to automatically register all validators found in the assembly containing `T`.
 
 ```csharp
-// add validation services and default options (you will need to register your validators)
+// add validation services and default options (you will need to register your FluentValidation validators)
 builder.Services.AddEndpointValidation();
 
 // OR
 
-// add validation services, default options, and register all validators in the assembly that contains the specified type
+// automatically register all FluentValidation validators in the assembly that contains the specified type
 builder.Services.AddEndpointValidation<Program>();
 
 // OR
@@ -83,7 +83,7 @@ app.UseEndpointValidation();
 
 Several options can be configured when registering the validation services:
 
-#### FallbackToDataAnnotations
+#### Fallback To Data Annotations
 
 By default, `[FromBody]` validation is done using any registered `FluentValidation` validator. If you prefer to use `System.ComponentModel.DataAnnotations` or you have a mixture of the two, you can set this option to `true` to fallback to use `DataAnnotations` when no `FluentValidation` validator is found.
 
@@ -95,7 +95,7 @@ builder.Services.AddEndpointValidation<Program>(options =>
 });
 ```
 
-#### PreferExplicitRequestModelValidation
+#### Prefer Explicit Request Model Validation
 
 By default, validation is performed automatically (implicitly) for all `[FromBody]` arguments. If you would prefer to explicitly specify which arguments should be validated, you can set this option to `true`, and use the `Validate<T>` endpoint filter instead:
 
@@ -106,12 +106,14 @@ builder.Services.AddEndpointValidation<Program>(options =>
     options.PreferExplicitRequestModelValidation = true;
 });
 
-// endpoint with explicit validation
+// will not be validated
 app.MapPost("/test-body", ([FromBody] TestRecord test) => test)
-    .Validate<TestRecord>();
+
+// will be validated
+app.MapPost("/test-body", ([FromBody] TestRecord test) => test).Validate<TestRecord>();
 ```
 
-#### JsonSerializerOptions
+#### Json Serializer Options
 
 This sets the `JsonSerializerOptions` used by the validation middleware. By default, the middleware will try to resolve the serializer options from the service collection via `Microsoft.AspNetCore.Http.Json.JsonOptions`:
 
