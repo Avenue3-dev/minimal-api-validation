@@ -1,0 +1,19 @@
+@HostAddress = http://localhost:5053
+
+###
+
+# with-query-list : 200 OK - valid
+GET {{HostAddress}}/with-query-list/
+    ?id=1
+    &id=2
+    &id=3
+Accept: application/json
+
+###
+
+# with-query-list : 400 BAD REQUEST - id out of range
+GET {{HostAddress}}/with-query-list/
+    ?id=1
+    &id=2
+    &id=0
+Accept: application/json

@@ -33,8 +33,26 @@ Accept: application/json
 
 ###
 
-# with-headers : 400 BAD REQUEST  - out of range
-GET {{HostAddress}}/with-headers/
+# with-query-string : 400 BAD REQUEST  - out of range
+GET {{HostAddress}}/with-query-string/
     ?requiredString=value
     &requiredRangedInt=0
+Accept: application/json
+
+###
+
+# with-query-group : 200 OK - valid
+GET {{HostAddress}}/with-query-group/
+    ?name=bilbo
+    &age=111
+    &other=abc
+Accept: application/json
+
+###
+
+# with-query-group : 400 BAD REQUEST - age out of range
+GET {{HostAddress}}/with-query-group/
+    ?name=bilbo
+    &age=200
+    &other=abc
 Accept: application/json

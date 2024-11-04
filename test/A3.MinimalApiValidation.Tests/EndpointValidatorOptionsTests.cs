@@ -10,7 +10,7 @@ public class EndpointValidatorOptionsTests
         {
             FallbackToDataAnnotations = false,
             JsonSerializerOptions = null,
-            PreferExplicitRequestBodyValidation = false,
+            PreferExplicitRequestModelValidation = false,
         };
 
         // Act

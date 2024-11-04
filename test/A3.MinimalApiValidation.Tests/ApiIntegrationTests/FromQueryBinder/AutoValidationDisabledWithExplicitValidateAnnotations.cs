@@ -1,10 +1,8 @@
-namespace A3.MinimalApiValidation.Tests.ApiIntegrationTests.Body;
+namespace A3.MinimalApiValidation.Tests.ApiIntegrationTests.FromQueryBinder;
 
-using System.Text;
-using System.Text.Json;
+using A3.MinimalApiValidation.Binders;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.Routing;
 
@@ -24,7 +22,7 @@ public class AutoValidationDisabledWithExplicitValidateAnnotations : TestBase
 
     protected override void AddTestEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost(Path, ([FromBody] TestRecordAnnotated body) => TypedResults.Ok()).Validate<TestRecordAnnotated>();
+        app.MapGet(Path, (FromQuery<TestRecordAnnotated> query) => TypedResults.Ok(query)).Validate<TestRecordAnnotated>();
     }
     
     [Theory]
@@ -34,16 +32,8 @@ public class AutoValidationDisabledWithExplicitValidateAnnotations : TestBase
     public async Task returns_bad_request_for_invalid_name(string? name)
     {
         // Arrange
-        var body = new
-        {
-            name = name,
-            age = 30,
-        };
-        var json = JsonSerializer.Serialize(body);
-        var content = new StringContent(json, Encoding.UTF8, "application/json");
-
         // Act
-        var response = await Client.PostAsync(Path, content);
+        var response = await Client.GetAsync($"{Path}?name={name}&age=55");
 
         // Assert
         await response.EnsureErrorFor("name");
@@ -57,16 +47,8 @@ public class AutoValidationDisabledWithExplicitValidateAnnotations : TestBase
     public async Task returns_bad_request_for_invalid_age(int age)
     {
         // Arrange
-        var body = new
-        {
-            name = "John",
-            age = age,
-        };
-        var json = JsonSerializer.Serialize(body);
-        var content = new StringContent(json, Encoding.UTF8, "application/json");
-
         // Act
-        var response = await Client.PostAsync(Path, content);
+        var response = await Client.GetAsync($"{Path}?name=James&age={age}");
 
         // Assert
         await response.EnsureErrorFor("age");
@@ -76,16 +58,8 @@ public class AutoValidationDisabledWithExplicitValidateAnnotations : TestBase
     public async Task returns_bad_request_for_invalid_name_and_age()
     {
         // Arrange
-        var body = new
-        {
-            name = "",
-            age = 0,
-        };
-        var json = JsonSerializer.Serialize(body);
-        var content = new StringContent(json, Encoding.UTF8, "application/json");
-
         // Act
-        var response = await Client.PostAsync(Path, content);
+        var response = await Client.GetAsync($"{Path}");
 
         // Assert
         await response.EnsureErrorFor("name", "age");
@@ -101,16 +75,8 @@ public class AutoValidationDisabledWithExplicitValidateAnnotations : TestBase
     public async Task returns_ok_for_valid_values(string name, int age)
     {
         // Arrange
-        var body = new
-        {
-            name = name,
-            age = age,
-        };
-        var json = JsonSerializer.Serialize(body);
-        var content = new StringContent(json, Encoding.UTF8, "application/json");
-
         // Act
-        var response = await Client.PostAsync(Path, content);
+        var response = await Client.GetAsync($"{Path}?name={name}&age={age}");
 
         // Assert
         response.EnsureSuccessStatusCode();

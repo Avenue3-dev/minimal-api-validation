@@ -18,13 +18,13 @@ internal record ParameterAttributeInfo
         IsQuery = query is not null;
         IsHeader = header is not null;
 
-        if (IsBody && IsQuery || IsBody && IsHeader || IsQuery && IsHeader)
+        if (Utils.IsMultiple(IsBody, IsQuery, IsHeader))
         {
             throw new InvalidOperationException(
                 "Parameter can only be one of FromBody, FromQuery, or FromHeader.");
         }
 
-        Name = header?.Name ?? query?.Name ?? parameter.Name
+        Name = query?.Name ?? header?.Name ?? parameter.Name
             ?? throw new ArgumentNullException(nameof(parameter), "Parameter name is required but was null.");
 
         ParameterType = parameter.ParameterType;

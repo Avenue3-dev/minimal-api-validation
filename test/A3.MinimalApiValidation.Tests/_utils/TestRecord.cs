@@ -3,6 +3,7 @@ namespace A3.MinimalApiValidation.Tests._utils;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 using FluentValidation;
+using Microsoft.AspNetCore.Mvc;
 
 public record TestRecord(string Name, int Age);
 
@@ -26,4 +27,19 @@ public record TestRecordAnnotated
     [Range(1, 100)]
     [JsonPropertyName("age")]
     public int Age { get; set; }
+}
+
+public record TestRecordRenamed(
+    [property: FromQuery(Name = "has-cake")] bool HasCake,
+    [property: FromQuery(Name = "eaten")]bool HasEatenIt
+);
+
+public class TestRecordRenamedValidator : AbstractValidator<TestRecordRenamed>
+{
+    public TestRecordRenamedValidator()
+    {
+        RuleFor(x => x)
+            .Must(x => x is not {HasCake: true, HasEatenIt: true})
+            .WithMessage("You can't have your cake and eat it too!");
+    }
 }

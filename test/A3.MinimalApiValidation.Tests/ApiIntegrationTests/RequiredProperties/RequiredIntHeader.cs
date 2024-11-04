@@ -52,4 +52,23 @@ public class RequiredIntHeader : TestBase
         // Assert
         await response.EnsureErrorFor("x-required");
     }
+
+    [Theory]
+    [InlineData("not-an-int")]
+    [InlineData("123-456-789")]
+    public async Task returns_bad_request_when_required_header_is_not_an_int(string header)
+    {
+        // Arrange
+        var request = new HttpRequestMessage(
+            method: HttpMethod.Get,
+            requestUri: Path
+        );
+        request.Headers.TryAddWithoutValidation("x-required", header);
+
+        // Act
+        var response = await Client.SendAsync(request);
+
+        // Assert
+        await response.EnsureErrorFor("x-required");
+    }
 }

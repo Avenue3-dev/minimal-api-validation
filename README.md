@@ -7,6 +7,7 @@ Easily add validation to your ASP.NET Core Minimal API endpoints to validate inc
 - Use `[FromBody]` to automatically validate arguments using any registered `FluentValidation` validator.
 - Use `[FromHeader]` in combination with any `ValidationAttribute` to automatically validate header arguments.
 - Use `[FromQuery]` in combination with any `ValidationAttribute` to automatically validate header query parameters.
+- Use custom `FromQuery<T>` to automatically bind and validate a group of dependent query parameters.
 
 ## Installation
 
@@ -94,7 +95,7 @@ builder.Services.AddEndpointValidation<Program>(options =>
 });
 ```
 
-#### PreferExplicitRequestBodyValidation
+#### PreferExplicitRequestModelValidation
 
 By default, validation is performed automatically (implicitly) for all `[FromBody]` arguments. If you would prefer to explicitly specify which arguments should be validated, you can set this option to `true`, and use the `Validate<T>` endpoint filter instead:
 
@@ -102,7 +103,7 @@ By default, validation is performed automatically (implicitly) for all `[FromBod
 builder.Services.AddEndpointValidation<Program>(options =>
 {
     // the default value is false
-    options.PreferExplicitRequestBodyValidation = true;
+    options.PreferExplicitRequestModelValidation = true;
 });
 
 // endpoint with explicit validation
@@ -174,6 +175,33 @@ app.MapGet("/test-query", ([FromQuery, Range(1, 5)] int page) => new { page });
 [FromQuery, MaxLength(20)] string? page
 ```
 
+#### Map multiple query parameters to a single object
+
+You can also map multiple query parameters to a single object using the `FromQuery<T>` binder. This allows you to bind and validate a group of dependent query parameters:
+
+```csharp
+// query parameters are matched to the given object and validated automatically based on any registered FluentValidation validator
+app.MapGet("/test-query-model", (FromQuery<TestRecord> test) => test);
+
+public record TestRecord(string Name, bool HasCake, bool HasEatenIt);
+
+public class TestRecordValidator : AbstractValidator<TestRecord>
+{
+    public TestRecordValidator()
+    {
+        RuleFor(x => x.Name).NotEmpty();
+        RuleFor(x => x)
+            .Must(x => x is not {HasCake: true, HasEatenIt: true})
+            .WithMessage("You can't have your cake and eat it too!");
+    }
+}
+
+// query parameters
+GET /test-query-model?name=John&hasCake=true&hasEatenIt=false
+```
+
+> You can also use the same validation options as with `FromBody` (see below), including using DataAnnotations instead of FluentValidation, and explicit validation rather than automatic validation.
+
 ### Request Body
 
 You can validate any request body automatically by using the `[FromBody]` attribute and registering a `FluentValidation` validator.
@@ -224,13 +252,13 @@ public record TestRecord
 
 #### Explicit Validation
 
-If you prefer to explicitly specify which arguments should be validated, you can set the `PreferExplicitRequestBodyValidation` option to `true` when registering the validation services, and use the `Validate<T>` endpoint filter instead:
+If you prefer to explicitly specify which arguments should be validated, you can set the `PreferExplicitRequestModelValidation` option to `true` when registering the validation services, and use the `Validate<T>` endpoint filter instead:
 
 ```csharp
-// set the PreferExplicitRequestBodyValidation option to true
+// set the PreferExplicitRequestModelValidation option to true
 builder.Services.AddEndpointValidation<Program>(options =>
 {
-    options.PreferExplicitRequestBodyValidation = true;
+    options.PreferExplicitRequestModelValidation = true;
 });
 
 // endpoint with explicit validation

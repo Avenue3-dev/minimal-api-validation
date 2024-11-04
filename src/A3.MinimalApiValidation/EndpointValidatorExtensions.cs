@@ -82,7 +82,7 @@ public static class EndpointValidationExtensions
     /// An <see cref="IValidator"/> must be registered in the DI container for the model type.
     /// </para>
     /// <para>
-    /// This filter will be ignored unless the <see cref="EndpointValidatorOptions.PreferExplicitRequestBodyValidation"/>
+    /// This filter will be ignored unless the <see cref="EndpointValidatorOptions.PreferExplicitRequestModelValidation"/>
     /// is set to <c>true</c>.
     /// </para>
     /// </summary>
@@ -93,7 +93,7 @@ public static class EndpointValidationExtensions
         where T : class
     {
         builder
-            .AddEndpointFilter<RequestBodyValidationFilter<T>>()
+            .AddEndpointFilter<RequestModelValidationFilter<T>>()
             .ProducesValidationProblem();
 
         return builder;

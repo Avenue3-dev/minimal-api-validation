@@ -6,22 +6,23 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.Routing;
 
-public class OptionalIntQueryParam : TestBase
+public class OptionalDateTimeQueryParam : TestBase
 {
-    public OptionalIntQueryParam(WebApplicationFactory<Program> factory) : base(factory)
+    public OptionalDateTimeQueryParam(WebApplicationFactory<Program> factory) : base(factory)
     {
     }
 
     protected override void AddTestEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapGet(Path, ([FromQuery] int? query) => TypedResults.Ok());
+        app.MapGet(Path, ([FromQuery] DateTime? query) => TypedResults.Ok());
     }
 
     [Theory]
-    [InlineData(1)]
-    [InlineData(2)]
-    [InlineData(123)]
-    public async Task returns_ok_when_required_query_param_is_valid(int query)
+    [InlineData("2022-02-22")]
+    [InlineData("2022-02-22T22:22:22")]
+    [InlineData("2022-02-22T22:22:22Z")]
+    [InlineData("2022-02-22T22:22:22.123")]
+    public async Task returns_ok_when_required_query_param_is_valid(string query)
     {
         // Arrange
         // Act
@@ -52,11 +53,11 @@ public class OptionalIntQueryParam : TestBase
         // Assert
         await response.EnsureErrorFor("query");
     }
-    
+
     [Theory]
-    [InlineData("not-an-int")]
-    [InlineData("123-456-789")]
-    public async Task returns_bad_request_when_required_query_param_is_not_an_int(string query)
+    [InlineData("not-a-date")]
+    [InlineData("123-456")]
+    public async Task returns_bad_request_when_required_query_param_is_not_a_date(string query)
     {
         // Arrange
         // Act
