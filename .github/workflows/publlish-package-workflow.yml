@@ -1,4 +1,4 @@
-name: publish-orchid-pre-release
+name: publish-package-workflow
 
 on:
   workflow_dispatch:
@@ -9,7 +9,7 @@ on:
         description: The release version number
 
 jobs:
-  create_pre_release:
+  create_release:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -37,10 +37,11 @@ jobs:
         run: dotnet pack -p:PackageVersion=${{ github.event.inputs.version }} -c Release -o ./.nupkgs
 
       - name: Publish
-        run: dotnet nuget push ./.nupkgs/*.nupkg \
-          --api-key ${{ secrets.NUGET_API_KEY }} \
-          --source https://api.nuget.org/v3/index.json \
-          --skip-duplicate
+        run: |
+          dotnet nuget push ./.nupkgs/*.nupkg \
+            --api-key ${{ secrets.NUGET_API_KEY }} \
+            --source https://api.nuget.org/v3/index.json \
+            --skip-duplicate
 
       - name: Initialize mandatory git config
         run: |
@@ -50,6 +51,7 @@ jobs:
       - name: Create and push tag
         shell: bash {0}
         run: |
+          VERSION=v${{ github.event.inputs.version }}
           git tag $VERSION
           git push origin $VERSION
           exit 0

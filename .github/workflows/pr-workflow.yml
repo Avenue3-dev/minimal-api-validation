@@ -1,4 +1,4 @@
-name: build-orchid-pr
+name: pr-workflow
 
 on:
   pull_request:
@@ -13,10 +13,6 @@ jobs:
   build_test:
     name: "Build and Test"
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
-        working-directory: app
 
     steps:
       - uses: actions/checkout@v4
@@ -37,14 +33,15 @@ jobs:
         run: dotnet build -c Release --no-restore MinimalApiValidation.sln
 
       - name: Test
-        run: dotnet test \
-          -c Release \
-          --no-restore \
-          --no-build \
-          --logger "trx;LogFileName=test-results.trx" \
-          --collect:"XPlat Code Coverage" \
-          --results-directory ./coverage \
-          --verbosity normal
+        run: |
+          dotnet test \
+            -c Release \
+            --no-restore \
+            --no-build \
+            --logger "trx;LogFileName=test-results.trx" \
+            --collect:"XPlat Code Coverage" \
+            --results-directory ./coverage \
+            --verbosity normal
 
       # REPORTS
 
