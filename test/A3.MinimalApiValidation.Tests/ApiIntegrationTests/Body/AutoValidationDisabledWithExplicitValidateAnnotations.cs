@@ -18,7 +18,7 @@ public class AutoValidationDisabledWithExplicitValidateAnnotations : TestBase
 
     protected override void ConfigureOptions(EndpointValidatorOptions options)
     {
-        options.PreferExplicitRequestBodyValidation = true;
+        options.PreferExplicitRequestModelValidation = true;
         options.FallbackToDataAnnotations = true;
     }
 

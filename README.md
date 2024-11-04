@@ -95,7 +95,7 @@ builder.Services.AddEndpointValidation<Program>(options =>
 });
 ```
 
-#### PreferExplicitRequestBodyValidation
+#### PreferExplicitRequestModelValidation
 
 By default, validation is performed automatically (implicitly) for all `[FromBody]` arguments. If you would prefer to explicitly specify which arguments should be validated, you can set this option to `true`, and use the `Validate<T>` endpoint filter instead:
 
@@ -103,7 +103,7 @@ By default, validation is performed automatically (implicitly) for all `[FromBod
 builder.Services.AddEndpointValidation<Program>(options =>
 {
     // the default value is false
-    options.PreferExplicitRequestBodyValidation = true;
+    options.PreferExplicitRequestModelValidation = true;
 });
 
 // endpoint with explicit validation
@@ -252,13 +252,13 @@ public record TestRecord
 
 #### Explicit Validation
 
-If you prefer to explicitly specify which arguments should be validated, you can set the `PreferExplicitRequestBodyValidation` option to `true` when registering the validation services, and use the `Validate<T>` endpoint filter instead:
+If you prefer to explicitly specify which arguments should be validated, you can set the `PreferExplicitRequestModelValidation` option to `true` when registering the validation services, and use the `Validate<T>` endpoint filter instead:
 
 ```csharp
-// set the PreferExplicitRequestBodyValidation option to true
+// set the PreferExplicitRequestModelValidation option to true
 builder.Services.AddEndpointValidation<Program>(options =>
 {
-    options.PreferExplicitRequestBodyValidation = true;
+    options.PreferExplicitRequestModelValidation = true;
 });
 
 // endpoint with explicit validation

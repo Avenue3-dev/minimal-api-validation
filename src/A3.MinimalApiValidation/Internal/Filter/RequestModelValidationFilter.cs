@@ -6,7 +6,7 @@ using FluentValidation.Results;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 
-internal class RequestBodyValidationFilter<T> : IEndpointFilter
+internal class RequestModelValidationFilter<T> : IEndpointFilter
     where T : class
 {
     public async ValueTask<object?> InvokeAsync(EndpointFilterInvocationContext context, EndpointFilterDelegate next)
@@ -16,7 +16,7 @@ internal class RequestBodyValidationFilter<T> : IEndpointFilter
         var options = context.HttpContext.RequestServices.GetService<EndpointValidatorOptions>()
             ?? EndpointValidatorOptions.Default;
 
-        var logger = context.HttpContext.GetLogger<RequestBodyValidationFilter<T>>();
+        var logger = context.HttpContext.GetLogger<RequestModelValidationFilter<T>>();
 
         // is there an argument that matches T?
         // if not, is there one that matches one of our custom binders?

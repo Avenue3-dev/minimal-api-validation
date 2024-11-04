@@ -14,7 +14,7 @@ public class AutoValidationDisabled : TestBase
 
     protected override void ConfigureOptions(EndpointValidatorOptions options)
     {
-        options.PreferExplicitRequestBodyValidation = true;
+        options.PreferExplicitRequestModelValidation = true;
     }
 
     protected override void AddTestEndpoint(IEndpointRouteBuilder app)

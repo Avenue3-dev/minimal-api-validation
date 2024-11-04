@@ -16,7 +16,7 @@ internal class ValidationMiddleware : IMiddleware
         var options = context.RequestServices.GetService<EndpointValidatorOptions>()
                 ?? EndpointValidatorOptions.Default;
 
-        if (options.PreferExplicitRequestBodyValidation)
+        if (options.PreferExplicitRequestModelValidation)
         {
             await next(context);
             return;
@@ -70,7 +70,7 @@ internal class ValidationMiddleware : IMiddleware
             logger.Debug_CheckingParameters(args.Length);
             foreach (var arg in args)
             {
-                if (arg.IsBody && !options.PreferExplicitRequestBodyValidation)
+                if (arg.IsBody && !options.PreferExplicitRequestModelValidation)
                 {
                     logger.Debug_HandlingBodyParameter(arg.Name);
 

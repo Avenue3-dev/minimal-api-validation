@@ -24,7 +24,7 @@ internal record ParameterAttributeInfo
                 "Parameter can only be one of FromBody, FromQuery, or FromHeader.");
         }
 
-        Name = header?.Name ?? query?.Name ?? parameter.Name
+        Name = query?.Name ?? header?.Name ?? parameter.Name
             ?? throw new ArgumentNullException(nameof(parameter), "Parameter name is required but was null.");
 
         ParameterType = parameter.ParameterType;

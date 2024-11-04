@@ -36,7 +36,7 @@ public class FromQuery<T> : IRouteDelegateBinder<FromQuery<T>> where T : class
         var query = context.Request.Query;
         var queryParams = info.CreateInstance(query) as T ?? throw new InvalidOperationException("Failed to create instance of type.");
 
-        if (options.PreferExplicitRequestBodyValidation)
+        if (options.PreferExplicitRequestModelValidation)
         {
             return new FromQuery<T>(queryParams);
         }

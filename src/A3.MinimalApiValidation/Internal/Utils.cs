@@ -198,7 +198,7 @@ internal static class Utils
         return false;
     }
     
-    private static Dictionary<Type, Func<string?, (bool, object?, object?)>> TypeParsers { get; } = new()
+    private static Dictionary<Type, Func<string?, (bool Success, object? CastValue, object? DefaultValue)>> TypeParsers { get; } = new()
     {
         { typeof(bool), v => (bool.TryParse(v, out var result), result, false) },
         { typeof(bool?), v => (bool.TryParse(v, out var result), result, null) },

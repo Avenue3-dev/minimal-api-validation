@@ -27,9 +27,9 @@ public class EndpointValidatorOptions
     public System.Text.Json.JsonSerializerOptions? JsonSerializerOptions { get; set; }
 
     /// <summary>
-    /// If set to <c>true</c>, request body validation will only be performed if
-    /// the endpoint uses the <see cref="RequestBodyValidationFilter{T}" /> endpoint filter.
+    /// If set to <c>true</c>, request model validation (body or query groups) will only be performed if
+    /// the endpoint uses the <see cref="RequestModelValidationFilter{T}" /> endpoint filter.
     /// <para>The default value is <c>false</c></para>
     /// </summary>
-    public bool PreferExplicitRequestBodyValidation { get; set; }
+    public bool PreferExplicitRequestModelValidation { get; set; }
 }

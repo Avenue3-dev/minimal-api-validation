@@ -86,16 +86,16 @@ public class IdListValidator : AbstractValidator<IdList>
 
 Example: `GET /test-query-model?id=1&id=2&id=3`
 
-### Property Binding
+### Query Parameter Names
 
-The property binding is performed using json deserialization, therefore query parameter names can be customized using the `JsonPropertyName` attribute:
+Query parameter names can be customized using the `FromQuery` attribute on the model properties:
 
 ```csharp
 app.MapGet("/test-query-model", (FromQuery<TestRecord> test) => { ... });
 
 public record TestRecord(
-    [property: FromQuery("has-cake")] bool HasCake,
-    [property: FromQuery("eaten")]bool HasEatenIt
+    [property: FromQuery(Name = "has-cake")] bool HasCake,
+    [property: FromQuery(Name = "eaten")]bool HasEatenIt
 );
 ```
 
@@ -119,12 +119,12 @@ public record TestRecord
 {
     [Required]
     [MinLength(1)]
-    [JsonPropertyName("name")]
+    [FromQuery(Name = "name")]
     public string Name { get; set; } = "";
 
     [Required]
     [Range(1, 100)]
-    [JsonPropertyName("age")]
+    [FromQuery(Name = "age")]
     public int Age { get; set; }
 }
 ```
@@ -133,13 +133,13 @@ Example: `GET /test-query-model?name=John&age=55`
 
 ### Explicit Validation
 
-If you prefer to explicitly specify which arguments should be validated, you can set the `PreferExplicitRequestBodyValidation` option to `true` when registering the validation services, and use the `Validate<T>` endpoint filter instead:
+If you prefer to explicitly specify which arguments should be validated, you can set the `PreferExplicitRequestModelValidation` option to `true` when registering the validation services, and use the `Validate<T>` endpoint filter instead:
 
 ```csharp
-// set the PreferExplicitRequestBodyValidation option to true
+// set the PreferExplicitRequestModelValidation option to true
 builder.Services.AddEndpointValidation<Program>(options =>
 {
-    options.PreferExplicitRequestBodyValidation = true;
+    options.PreferExplicitRequestModelValidation = true;
 });
 
 // endpoint with explicit validation
