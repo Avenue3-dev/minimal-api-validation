@@ -3,7 +3,7 @@ name: pr-workflow
 on:
   pull_request:
     branches:
-      - "main"
+      - main
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -13,6 +13,10 @@ jobs:
   build_test:
     name: "Build and Test"
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      checks: write
+      contents: read
 
     steps:
       - uses: actions/checkout@v4
