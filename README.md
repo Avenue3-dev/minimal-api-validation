@@ -267,7 +267,7 @@ builder.Services.AddEndpointValidation<Program>(options =>
 app.MapPost("/test-body", ([FromBody] TestRecord test) => test)
     .Validate<TestRecord>();
 
-// arrays are supported
+// collections are supported too
 app.MapPost("/test-body", ([FromBody] TestRecord[] tests) => test)
     .Validate<TestRecord>();
 ```
@@ -322,3 +322,7 @@ If validation fails, a `ValidationProblem` result is returned which produces a `
   }
 }
 ```
+
+## FAQs
+
+You can check out more docs and some FAQs [here](./docs)

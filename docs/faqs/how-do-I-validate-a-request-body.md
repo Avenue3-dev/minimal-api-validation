@@ -67,6 +67,6 @@ app.MapPost("/test-body", ([FromBody] TestRecord test) => { ... ]);
 // will be validated
 app.MapPost("/test-body", ([FromBody] TestRecord { ... }) => test).Validate<TestRecord>();
 
-// arrays are supported too
+// collections are supported too
 app.MapPost("/test-body", ([FromBody] TestRecord[] { ... }) => test).Validate<TestRecord>();
 ```

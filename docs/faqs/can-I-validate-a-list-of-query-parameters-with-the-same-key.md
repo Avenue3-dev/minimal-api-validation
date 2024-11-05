@@ -34,7 +34,7 @@ Multiple lists are supported, as is just matching a subset of the query paramete
 app.MapGet("/test-query-model", ([FromQuery] string name, FromQuery<TestRecord> test) => { ... });
 
 public record TestRecord(
-    Guid Referecne,
+    Guid Reference,
     [property: FromQuery(Name = "id")]int[] Ids
     [property: FromQuery(Name = "item")]string[] Items
 );
@@ -43,9 +43,9 @@ public class TestRecordValidator : AbstractValidator<TestRecord>
 {
     public TestRecordValidator()
     {
-        RuleFor(x => x)
-            .Must(x => x is not {HasCake: true, HasEatenIt: true})
-            .WithMessage("You can't have your cake and eat it too!");
+        RuleFor(x => x.Reference).NotEmpty();
+        RuleForEach(x => x.Ids).GreaterThan(0);
+        RuleForEach(x => x.Items).NotEmpty();
     }
 }
 ```
