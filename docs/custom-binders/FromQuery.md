@@ -7,8 +7,6 @@ You can map multiple query parameters to a single object using the `FromQuery<T>
 
 > The `FromQuery<T>` model binding does not support nested objects.
 
-```csharp
-
 To validate, just register a FluentValidation validator for the same type.
 
 ```csharp
