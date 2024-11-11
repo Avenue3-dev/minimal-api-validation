@@ -8,7 +8,7 @@
     <IsPackable>true</IsPackable>
 
     <!--  nuget details  -->
-    <PackageId>A3.MinimalApiValidation</PackageId>
+    <PackageId>Avenue3.MinimalApiValidation</PackageId>
     <PackageIcon>avenue3-logo.png</PackageIcon>
     <Authors>Avenue3-dev</Authors>
     <Copyright>Avenue3 Ltd</Copyright>

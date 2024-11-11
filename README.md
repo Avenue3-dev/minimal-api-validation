@@ -1,6 +1,6 @@
 # MinimalApiValidation
 
-[![build](https://github.com/Avenue3-dev/minimal-api-validation/actions/workflows/main.yml/badge.svg)](https://github.com/Avenue3-dev/minimal-api-validation/actions/workflows/main.yml) [![nuget](https://img.shields.io/nuget/v/A3.MinimalApiValidation.svg?style=flat)](https://www.nuget.org/packages/A3.MinimalApiValidation) ![license](https://img.shields.io/github/license/Avenue3-dev/eslint-config-avenue3)
+[![build](https://github.com/Avenue3-dev/minimal-api-validation/actions/workflows/main.yml/badge.svg)](https://github.com/Avenue3-dev/minimal-api-validation/actions/workflows/main.yml) [![nuget](https://img.shields.io/nuget/v/Avenue3.MinimalApiValidation.svg?style=flat)](https://www.nuget.org/packages/Avenue3.MinimalApiValidation) ![license](https://img.shields.io/github/license/Avenue3-dev/eslint-config-avenue3)
 
 Easily add validation to your ASP.NET Core Minimal API endpoints to validate incoming request headers, query parameters, and the request body.
 
@@ -14,7 +14,7 @@ Easily add validation to your ASP.NET Core Minimal API endpoints to validate inc
 To install the package:
 
 ```bash
-dotnet add package A3.MinimalApiValidation
+dotnet add package Avenue3.MinimalApiValidation
 ```
 
 ## Basic Usage
