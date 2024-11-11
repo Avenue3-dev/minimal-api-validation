@@ -11,8 +11,6 @@ on:
 jobs:
   create_release:
     runs-on: ubuntu-latest
-    permissions:
-      packages: write
     steps:
       - uses: actions/checkout@v4
 
@@ -63,6 +61,5 @@ jobs:
           VERSION=v${{ github.event.inputs.version }}
           git tag $VERSION
           git push origin $VERSION
-          exit 0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
