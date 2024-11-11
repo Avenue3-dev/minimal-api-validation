@@ -9,7 +9,6 @@
 
     <!--  nuget details  -->
     <PackageId>A3.MinimalApiValidation</PackageId>
-    <PackageVersion>1.0.0-beta</PackageVersion>
     <PackageIcon>avenue3-logo.png</PackageIcon>
     <Authors>Avenue3-dev</Authors>
     <Copyright>Avenue3 Ltd</Copyright>

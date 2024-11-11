@@ -1,7 +1,7 @@
-name: pr-workflow
+name: main
 
 on:
-  pull_request:
+  push:
     branches:
       - main
     paths-ignore:
@@ -9,10 +9,6 @@ on:
       - LICENSE
       - docs/**
       - assets/**
-
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
 
 jobs:
   build_test:
@@ -83,36 +79,3 @@ jobs:
         with:
           name: coverage-report
           path: "**/coverage/coveragereport"
-
-      # JOB SUMMARY
-
-      - name: Write Test Summary to Job Summary
-        run: |
-          cat << EOF > test-summary.md
-          # Summary - Unit Tests
-          | Result | Passed | Failed | Skipped |
-          |--------|--------|--------|---------|
-          | ${{ steps.test_report.outputs.conclusion }} | :green_heart: ${{ steps.test_report.outputs.passed }} | :broken_heart: ${{ steps.test_report.outputs.failed }} | :zzz: ${{ steps.test_report.outputs.skipped }} |
-          EOF
-          cat test-summary.md >> $GITHUB_STEP_SUMMARY
-
-      - name: Write Coverage to Job Summary
-        run: cat coverage/coveragereport/SummaryGithub.md >> $GITHUB_STEP_SUMMARY
-
-      # PR COMMENTS
-
-      - name: Add Test Summary PR Comment
-        uses: marocchino/sticky-pull-request-comment@v2
-        if: github.event_name == 'pull_request'
-        with:
-          header: "Test-Summary"
-          recreate: true
-          path: "**/test-summary.md"
-
-      - name: Add Coverage PR Comment
-        uses: marocchino/sticky-pull-request-comment@v2
-        if: github.event_name == 'pull_request'
-        with:
-          header: "Test-Summary"
-          path: "**/coverage/coveragereport/SummaryGithub.md"
-          append: true
