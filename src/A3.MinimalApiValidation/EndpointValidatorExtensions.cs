@@ -98,4 +98,23 @@ public static class EndpointValidationExtensions
 
         return builder;
     }
+
+    /// <summary>
+    /// Ads an endpoint filter that will allow validation of the request, but not
+    /// execute the endpoint if the validate only header is present.
+    /// <para>A 202 Accepted response is returned if the request is valid.</para>
+    /// <para>The default header is `x-validate-only`, but can be overridden in the <see cref="EndpointValidatorOptions"/>.</para>
+    /// </summary>
+    /// <param name="builder">The route handler builder.</param>
+    /// <returns>The route handler builder.</returns>
+    public static RouteHandlerBuilder WithValidateOnly(this RouteHandlerBuilder builder)
+    {
+        builder
+            .AddEndpointFilter<ValidateOnlyFilter>()
+            .Produces<ValidateOnlyResponse>(
+                statusCode: StatusCodes.Status202Accepted,
+                contentType: "application/json");
+
+        return builder;
+    }
 }

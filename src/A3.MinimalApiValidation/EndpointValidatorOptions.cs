@@ -32,4 +32,10 @@ public class EndpointValidatorOptions
     /// <para>The default value is <c>false</c></para>
     /// </summary>
     public bool PreferExplicitRequestModelValidation { get; set; }
+    
+    /// <summary>
+    /// Used to set the name for the validate only header for use with the <see cref="ValidateOnlyFilter"/>.
+    /// <para>The default value is 'x-validate-only'.</para>
+    /// </summary>
+    public string ValidateOnlyHeader { get; set; } = "x-validate-only";
 }

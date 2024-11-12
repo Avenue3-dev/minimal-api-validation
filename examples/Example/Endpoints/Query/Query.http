@@ -13,7 +13,7 @@ Accept: application/json
 # with-query-string : 200 OK - valid with optional
 GET {{HostAddress}}/with-query-string/
     ?requiredString=value
-    &optionalRangedInt=optional
+    &optionalString=optional
     &requiredRangedInt=1
     &optionalRangedInt=6
 Accept: application/json
@@ -37,22 +37,4 @@ Accept: application/json
 GET {{HostAddress}}/with-query-string/
     ?requiredString=value
     &requiredRangedInt=0
-Accept: application/json
-
-###
-
-# with-query-group : 200 OK - valid
-GET {{HostAddress}}/with-query-group/
-    ?name=bilbo
-    &age=111
-    &other=abc
-Accept: application/json
-
-###
-
-# with-query-group : 400 BAD REQUEST - age out of range
-GET {{HostAddress}}/with-query-group/
-    ?name=bilbo
-    &age=200
-    &other=abc
 Accept: application/json

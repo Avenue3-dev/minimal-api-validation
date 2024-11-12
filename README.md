@@ -125,6 +125,20 @@ builder.Services.AddEndpointValidation<Program>(options =>
 });
 ```
 
+#### Validate Only Header
+
+This sets the header that the middleware will look for to determine if the request should only be validated. If the header is present, the request will be validated, but the endpoint will not be executed:
+
+```csharp
+builder.Services.AddEndpointValidation<Program>(options =>
+{
+    // the default value is "x-validate-only"
+    options.ValidateOnlyHeader = "x-custom-validate-only";
+});
+```
+
+> See the [Validation Only](#validation-only) section for more information.
+
 ## Validation
 
 The package provides several features and helpers for validating incoming requests:
@@ -321,6 +335,50 @@ If validation fails, a `ValidationProblem` result is returned which produces a `
     "Age": ["The Age field must be between 1 and 100."]
   }
 }
+```
+
+## Validation Only
+
+If you want to validate a request without executing the endpoint, you can use the `WithValidateOnly` endpoint filter in combination with the optional `ValidateOnlyHeader`:
+
+```csharp
+app.MapPost("/test-body", ([FromBody] TestRecord test) => test).WithValidateOnly();
+```
+
+This filter looks for the configured `ValidateOnlyHeader` in the request and returns and intercepts the request between validation and endpoint execution, returning a `202 Accepted` response if the request is valid.
+
+> The header is optional, and must be present and set to `true` for the filter to take effect.
+
+Request:
+```http request
+POST /test-body
+Content-Type: application/json
+x-validate-only: true
+
+{
+  "name": "John",
+  "age": 30
+}
+```
+
+Response:
+```json
+{
+  "isValid": true,
+  "message": "Request was validated but not processed.",
+  "timestamp": "2024-11-12T14:30:26.3682090+00:00"
+}
+```
+
+### Custom Validate Only Header
+
+The default header is `x-validate-only`, but this can be configured when registering the validation services:
+
+```csharp
+builder.Services.AddEndpointValidation<Program>(options =>
+{
+    options.ValidateOnlyHeader = "x-custom-validate-only";
+});
 ```
 
 ## FAQs

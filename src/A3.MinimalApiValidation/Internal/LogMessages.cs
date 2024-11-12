@@ -47,4 +47,7 @@ internal static partial class LogMessages
 
     [LoggerMessage(LogLevel.Debug, "Handling header parameter: {Name}.", EventId = 0)]
     internal static partial void Debug_HandlingHeaderParameter(this ILogger logger, string name);
+    
+    [LoggerMessage(LogLevel.Debug, "Validate only header was set, returning validate only response", EventId = 0)]
+    internal static partial void Debug_ValidateOnlyHeaderSet(this ILogger logger);
 }
