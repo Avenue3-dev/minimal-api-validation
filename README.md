@@ -384,3 +384,7 @@ builder.Services.AddEndpointValidation<Program>(options =>
 ## FAQs
 
 You can check out more docs and some FAQs [here](./docs)
+
+## Examples
+
+You can find some examples in the [examples](./examples) folder.

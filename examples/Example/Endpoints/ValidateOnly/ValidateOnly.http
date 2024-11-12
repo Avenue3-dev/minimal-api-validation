@@ -1,0 +1,53 @@
+@HostAddress = http://localhost:5053
+
+# with-validate-only : 202 ACCEPTED - valid
+POST {{HostAddress}}/with-validate-only?requiredString=value
+Accept: application/json
+Content-Type: application/json
+x-validate-only: true
+x-required-header: value2
+
+{
+    "name": "John",
+    "age": 32
+}
+
+###
+
+# with-validate-only : 400 BAD REQUEST - missing query parameter
+POST {{HostAddress}}/with-validate-only
+Accept: application/json
+Content-Type: application/json
+x-validate-only: true
+x-required-header: value2
+
+{
+  "name": "John",
+  "age": 32
+}
+
+###
+
+# with-validate-only : 400 BAD REQUEST - missing header
+POST {{HostAddress}}/with-validate-only?requiredString=value
+Accept: application/json
+Content-Type: application/json
+x-validate-only: true
+
+{
+  "name": "John",
+  "age": 32
+}
+
+###
+
+# with-validate-only : 400 BAD REQUEST - missing name
+POST {{HostAddress}}/with-validate-only?requiredString=value
+Accept: application/json
+Content-Type: application/json
+x-validate-only: true
+x-required-header: value2
+
+{
+  "age": 32
+}
