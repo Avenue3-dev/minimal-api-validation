@@ -100,7 +100,7 @@ public static class EndpointValidationExtensions
     }
 
     /// <summary>
-    /// Ads an endpoint filter that will allow validation of the request, but not
+    /// Adds an endpoint filter that will allow validation of the request, but not
     /// execute the endpoint if the validate only header is present.
     /// <para>A 202 Accepted response is returned if the request is valid.</para>
     /// <para>The default header is `x-validate-only`, but can be overridden in the <see cref="EndpointValidatorOptions"/>.</para>
