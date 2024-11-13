@@ -11,6 +11,7 @@ public class EndpointValidatorOptionsTests
             FallbackToDataAnnotations = false,
             JsonSerializerOptions = null,
             PreferExplicitRequestModelValidation = false,
+            ValidateOnlyHeader = "x-validate-only",
         };
 
         // Act

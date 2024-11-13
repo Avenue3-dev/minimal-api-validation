@@ -1,13 +1,19 @@
-namespace Example.Endpoints.Body;
+namespace Example.Endpoints.ValidateOnly;
 
+using A3.MinimalApiValidation;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 
-public class EndpointWithBody : IEndpoint
+public class EndpointWithValidateOnly : IEndpoint
 {
     public static void Add(IEndpointRouteBuilder app)
     {
-        app.MapPost("with-body", ([FromBody] TestRecord body) => TypedResults.Ok(body));
+        app.MapPost("with-validate-only", (
+            [FromQuery] string requiredString,
+            [FromHeader(Name = "x-required-header")] string requiredHeader,
+            [FromBody] TestRecord body
+        ) => Results.StatusCode(500))
+        .WithValidateOnly();
     }
 
     public record TestRecord(string Name, int Age);
