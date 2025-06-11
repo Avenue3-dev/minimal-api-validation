@@ -51,7 +51,7 @@ jobs:
       # REPORTS
 
       - name: Generate Test Report
-        uses: dorny/test-reporter@v1
+        uses: dorny/test-reporter@v2
         if: always()
         id: test_report
         with:
