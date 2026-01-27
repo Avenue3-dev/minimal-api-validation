@@ -22,9 +22,14 @@ internal static class Body
 
         if (string.IsNullOrEmpty(json))
         {
-            return new ValidationFailure("body", "A body is required but was null or empty.");
+            if (!arg.IsNullable)
+            {
+                return new ValidationFailure("body", "A body is required but was null or empty.");
+            }
+            
+            return new BodyValidationResult([], null);
         }
-
+        
         var jsonOptions = context.GetJsonOptions();
 
         if (!Utils.TryDeserialize(json, arg.ParameterType, jsonOptions, out var value, out var errors))
