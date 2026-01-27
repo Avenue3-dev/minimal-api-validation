@@ -22,11 +22,13 @@ internal static class Body
 
         if (string.IsNullOrEmpty(json))
         {
+            // if no body present and is not nullable, return failure for the body as a whole
             if (!arg.IsNullable)
             {
                 return new ValidationFailure("body", "A body is required but was null or empty.");
             }
             
+            // no body to process and is nullable, so we return success
             return new BodyValidationResult([], null);
         }
         
