@@ -19,6 +19,16 @@ public class FluentValidatorRegistered : TestBase
         app.MapPost(Path, ([FromBody] TestRecord body) => TypedResults.Ok());
     }
     
+    [Fact]
+    public async Task returns_bad_request_null_body()
+    {
+        // Arrange & Act
+        var response = await Client.PostAsync(Path, null);
+
+        // Assert
+        await response.EnsureErrorFor("body");
+    }
+    
     [Theory]
     [InlineData(null)]
     [InlineData("")]
