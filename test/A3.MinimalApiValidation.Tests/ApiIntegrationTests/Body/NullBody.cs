@@ -8,9 +8,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.Routing;
 
-public class DataAnnotationsValidatorFallback : TestBase
+public class NullBody : TestBase
 {
-    public DataAnnotationsValidatorFallback(WebApplicationFactory<Program> factory) : base(factory)
+    public NullBody(WebApplicationFactory<Program> factory) : base(factory)
     {
     }
     
@@ -23,39 +23,17 @@ public class DataAnnotationsValidatorFallback : TestBase
 
     protected override void AddTestEndpoint(IEndpointRouteBuilder app)
     {
-        app.MapPost(Path, ([FromBody] TestRecordAnnotated body) => TypedResults.Ok());
+        app.MapPost(Path, ([FromBody] TestRecordAnnotated? body) => TypedResults.Ok());
     }
     
     [Fact]
-    public async Task returns_bad_request_null_body()
+    public async Task returns_ok_when_null_body()
     {
         // Arrange & Act
         var response = await Client.PostAsync(Path, null);
 
         // Assert
-        await response.EnsureErrorFor("body");
-    }
-    
-    [Theory]
-    [InlineData(null)]
-    [InlineData("")]
-    [InlineData(" ")]
-    public async Task returns_bad_request_for_invalid_name(string? name)
-    {
-        // Arrange
-        var body = new
-        {
-            name = name,
-            age = 30,
-        };
-        var json = JsonSerializer.Serialize(body);
-        var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-        // Act
-        var response = await Client.PostAsync(Path, content);
-
-        // Assert
-        await response.EnsureErrorFor("name");
+        response.EnsureSuccessStatusCode();
     }
     
     [Theory]
