@@ -102,7 +102,7 @@ jobs:
       # PR COMMENTS
 
       - name: Add Test Summary PR Comment
-        uses: marocchino/sticky-pull-request-comment@v2
+        uses: marocchino/sticky-pull-request-comment@v3
         if: github.event_name == 'pull_request'
         with:
           header: "Test-Summary"
@@ -110,7 +110,7 @@ jobs:
           path: "**/test-summary.md"
 
       - name: Add Coverage PR Comment
-        uses: marocchino/sticky-pull-request-comment@v2
+        uses: marocchino/sticky-pull-request-comment@v3
         if: github.event_name == 'pull_request'
         with:
           header: "Test-Summary"
