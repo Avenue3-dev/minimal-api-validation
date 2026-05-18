@@ -23,8 +23,9 @@ public class FromQueryListBinding : TestBase
         List<Guid> Ids,
         string[] Items,
         IEnumerable<int> Numbers,
-        IReadOnlyCollection<DateTime> Dates);
-    
+        IReadOnlyCollection<DateTime> Dates,
+        IReadOnlyCollection<DateOnly> OnlyDates);
+
     [Fact]
     public async Task properties_are_bound_correctly()
     {
@@ -38,6 +39,8 @@ public class FromQueryListBinding : TestBase
         var number2 = 73;
         var date1 = "2022-01-01T00:00:00Z";
         var date2 = "2022-01-02T00:00:00Z";
+        var dateOnly1 = "2022-01-01";
+        var dateOnly2 = "2022-01-02";
         
         // Act
         var response = await Client.GetAsync($"{Path}" +
@@ -45,7 +48,8 @@ public class FromQueryListBinding : TestBase
             $"&ids={id1}&ids={id2}" +
             $"&items={item1}&items={item2}" +
             $"&numbers={number1}&numbers={number2}" +
-            $"&dates={date1}&dates={date2}");
+            $"&dates={date1}&dates={date2}" +
+            $"&onlyDates={dateOnly1}&onlyDates={dateOnly2}");
 
         // Assert
         response.EnsureSuccessStatusCode();
@@ -64,5 +68,7 @@ public class FromQueryListBinding : TestBase
         Assert.Equal(2, result.Dates.Count);
         Assert.Equal(DateTime.Parse(date1), result.Dates.First());
         Assert.Equal(DateTime.Parse(date2), result.Dates.Last());
+        Assert.Equal(DateOnly.Parse(dateOnly1), result.OnlyDates.First());
+        Assert.Equal(DateOnly.Parse(dateOnly2), result.OnlyDates.Last());
     }
 }
