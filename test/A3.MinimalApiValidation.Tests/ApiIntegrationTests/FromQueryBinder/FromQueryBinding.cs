@@ -1,7 +1,7 @@
 namespace A3.MinimalApiValidation.Tests.ApiIntegrationTests.FromQueryBinder;
 
 using System.Net.Http.Json;
-using A3.MinimalApiValidation.Binders;
+using Binders;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -24,11 +24,12 @@ public class FromQueryBinding : TestBase
         int Age,
         [property: FromQuery(Name = "has-cake")] bool HasCake,
         DateTime Time,
-        [property: FromQuery(Name = "user-id")]Guid Id,
+        DateOnly Date,
+        [property: FromQuery(Name = "user-id")] Guid Id,
         long? OptionalLong,
         string? OptionalString
     );
-    
+
     [Theory]
     [InlineData(null, null)]
     [InlineData(42L, "Hello")]
@@ -41,14 +42,16 @@ public class FromQueryBinding : TestBase
         var age = 42;
         var hasCake = true;
         var time = "2022-01-01T00:00:00Z";
+        var date = "2022-01-01";
         var id = "B6DFFA8C-AE7D-4C39-AFEF-7B11FECA6C65";
-        
+
         // Act
         var response = await Client.GetAsync($"{Path}" +
             $"?name={name}" +
             $"&age={age}" +
             $"&has-cake={hasCake}" +
             $"&time={time}" +
+            $"&date={date}" +
             $"&user-id={id}" +
             $"&optionalLong={optionalLong}" +
             $"&optionalString={optionalString}");
@@ -61,6 +64,7 @@ public class FromQueryBinding : TestBase
         Assert.Equal(age, result.Age);
         Assert.True(result.HasCake);
         Assert.Equal(DateTime.Parse(time), result.Time);
+        Assert.Equal(DateOnly.Parse(date), result.Date);
         Assert.Equal(Guid.Parse(id), result.Id);
         Assert.Equal(optionalLong, result.OptionalLong);
         Assert.Equal(optionalString ?? string.Empty, result.OptionalString);
