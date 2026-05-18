@@ -49,7 +49,7 @@ public class FromQueryListBinding : TestBase
             $"&items={item1}&items={item2}" +
             $"&numbers={number1}&numbers={number2}" +
             $"&dates={date1}&dates={date2}" +
-            $"&onlyDates={dateOnly1}&onlyDates{dateOnly2}");
+            $"&onlyDates={dateOnly1}&onlyDates={dateOnly2}");
 
         // Assert
         response.EnsureSuccessStatusCode();
