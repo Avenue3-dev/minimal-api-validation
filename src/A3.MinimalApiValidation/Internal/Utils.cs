@@ -124,7 +124,7 @@ internal static class Utils
             return false;
         }
 
-        if (type is {IsInterface: true, IsGenericType: true}
+        if (type is { IsInterface: true, IsGenericType: true }
             && type.GetGenericTypeDefinition() == typeof(IEnumerable<>))
         {
             firstUnderlyingType = type.GetGenericArguments()[0];
@@ -148,7 +148,7 @@ internal static class Utils
     {
         var results = new List<ValidationFailure>();
         var failedIndexes = new List<int>();
-        foreach (var item in collection.Select((v, i) => new {Index = i, Value = v}))
+        foreach (var item in collection.Select((v, i) => new { Index = i, Value = v }))
         {
             var itemResult = await (validator is null
                 ? ValidateDataAnnotationsAsync(item.Value, options)
@@ -174,7 +174,7 @@ internal static class Utils
         var didCast = TryCastValue(value, type, out var castValue, out var defaultValue);
         return didCast ? castValue : defaultValue;
     }
-    
+
     public static bool TryCastValue(string? value, Type type, out object? castValue, out object? defaultValue)
     {
         castValue = null;
@@ -184,10 +184,10 @@ internal static class Utils
         {
             return false;
         }
-        
+
         var (success, result, def) = parser(value);
         defaultValue = def;
-        
+
         if (success)
         {
             castValue = result;
@@ -197,7 +197,7 @@ internal static class Utils
         castValue = defaultValue;
         return false;
     }
-    
+
     private static Dictionary<Type, Func<string?, (bool Success, object? CastValue, object? DefaultValue)>> TypeParsers { get; } = new()
     {
         { typeof(bool), v => (bool.TryParse(v, out var result), result, false) },
@@ -214,6 +214,8 @@ internal static class Utils
         { typeof(decimal?), v => (decimal.TryParse(v, NumberStyles.Number, CultureInfo.InvariantCulture, out var result), result, null) },
         { typeof(DateTime), v => (DateTime.TryParse(v, CultureInfo.InvariantCulture, DateTimeStyles.None, out var result), result, default(DateTime)) },
         { typeof(DateTime?), v => (DateTime.TryParse(v, CultureInfo.InvariantCulture, DateTimeStyles.None, out var result), result, null) },
+        { typeof(DateOnly), v => (DateOnly.TryParse(v, CultureInfo.InvariantCulture, DateTimeStyles.None, out var result), result, default(DateOnly)) },
+        { typeof(DateOnly?), v => (DateOnly.TryParse(v, CultureInfo.InvariantCulture, DateTimeStyles.None, out var result), result, null) },
         { typeof(Guid), v => (Guid.TryParse(v, out var result), result, default(Guid)) },
         { typeof(Guid?), v => (Guid.TryParse(v, out var result), result, null) },
         { typeof(string), v => (true, v, default(string)) },
