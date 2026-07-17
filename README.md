@@ -218,6 +218,47 @@ GET /test-query-model?name=John&hasCake=true&hasEatenIt=false
 
 > You can also use the same validation options as with `FromBody` (see below), including using DataAnnotations instead of FluentValidation, and explicit validation rather than automatic validation.
 
+#### Collection query parameters and headers
+
+Collection-typed parameters (`string[]`, `int[]`, etc.) are bound from repeated keys (`?tag=a&tag=b`)
+and validated per element. This works for both `[FromQuery]` and `[FromHeader]`:
+
+```csharp
+// each value is parsed and validated; ?tag=a&tag=b binds two elements
+app.MapGet("/test-collection", ([FromQuery] string[]? tag) => new { tag });
+```
+
+Any `ValidationAttribute` on a collection parameter is applied to the **collection itself** — matching
+`System.ComponentModel.DataAnnotations` semantics — so `[MinLength]`/`[MaxLength]`/`[Length]` constrain
+the **item count**:
+
+```csharp
+// between 1 and 3 ids must be supplied
+app.MapGet("/test-collection", ([FromQuery, MinLength(1), MaxLength(3)] int[] id) => new { id });
+```
+
+> To validate **each element** against a rule (e.g. each string matches a pattern), use the
+> `FromQuery<T>` binder with a FluentValidation `RuleForEach`. Note the minimal API framework only binds
+> arrays / `StringValues` for a bare `[FromQuery]` parameter; use `FromQuery<T>` for `List<T>` /
+> `IEnumerable<T>` collection properties.
+
+#### Enums and custom parsable types
+
+Any type the minimal API framework can bind from a string is also validated, including regular `enum`s
+and custom "smart enum" types that expose a static `TryParse(string, out T)` (or implement
+`IParsable<T>`). A value that fails to parse produces a `400`:
+
+```csharp
+// ?day=Monday is valid; ?day=Someday returns a 400
+app.MapGet("/test-enum", ([FromQuery] DayOfWeek day) => new { day });
+
+// combine with a collection to enforce "1-3 values, each from a closed set"
+app.MapGet("/test-animals", ([FromQuery, MinLength(1), MaxLength(3)] Animal[] animal) => new { animal });
+```
+
+> For a custom enumeration to be used in a query string or header, it must be bindable by the framework —
+> that means exposing a static `TryParse(string, out T)` or implementing `IParsable<T>`.
+
 ### Request Body
 
 You can validate any request body automatically by using the `[FromBody]` attribute and registering a `FluentValidation` validator.
