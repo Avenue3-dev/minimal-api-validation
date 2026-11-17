@@ -1,8 +1,10 @@
 namespace A3.MinimalApiValidation.Internal;
 
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Reflection;
 using System.Text.Json;
 using A3.MinimalApiValidation.Internal.Middleware;
 using FluentValidation;
@@ -116,6 +118,22 @@ internal static class Utils
         }
     }
 
+    /// <summary>
+    /// Determines whether <paramref name="type"/> should be treated as a collection of values for
+    /// header/query validation. <see cref="string"/> is intentionally excluded (it is an
+    /// <see cref="IEnumerable{Char}"/> but must be validated as a scalar).
+    /// </summary>
+    public static bool IsCollectionType(Type type, [NotNullWhen(true)] out Type? elementType)
+    {
+        if (type == typeof(string))
+        {
+            elementType = null;
+            return false;
+        }
+
+        return IsEnumerable(type, out elementType);
+    }
+
     public static bool IsEnumerable(Type type, [NotNullWhen(true)] out Type? firstUnderlyingType)
     {
         if (!typeof(IEnumerable).IsAssignableFrom(type))
@@ -180,22 +198,112 @@ internal static class Utils
         castValue = null;
         defaultValue = null;
 
-        if (!TypeParsers.TryGetValue(type, out var parser))
+        if (TypeParsers.TryGetValue(type, out var parser))
+        {
+            var (success, result, def) = parser(value);
+            defaultValue = def;
+
+            if (success)
+            {
+                castValue = result;
+                return true;
+            }
+
+            castValue = defaultValue;
+            return false;
+        }
+
+        // fall back to a parse convention (enums, IParsable<T>, or a static TryParse method).
+        // this lets us validate any type the minimal api framework can bind, e.g. custom
+        // "smart enum" types that expose a static TryParse(string, out T).
+        var conventionParser = ConventionParsers.GetOrAdd(type, ResolveConventionParser);
+        if (conventionParser is null)
         {
             return false;
         }
 
-        var (success, result, def) = parser(value);
-        defaultValue = def;
-
-        if (success)
+        var (ok, parsed) = conventionParser(value);
+        if (ok)
         {
-            castValue = result;
+            castValue = parsed;
             return true;
         }
 
-        castValue = defaultValue;
         return false;
+    }
+
+    private static ConcurrentDictionary<Type, Func<string?, (bool Success, object? Value)>?> ConventionParsers { get; } = new();
+
+    private static Func<string?, (bool Success, object? Value)>? ResolveConventionParser(Type type)
+    {
+        // 1. real enums
+        if (type.IsEnum)
+        {
+            return v =>
+            {
+                if (v is null)
+                {
+                    return (false, null);
+                }
+
+                var ok = Enum.TryParse(type, v, ignoreCase: false, out var result);
+                return (ok, ok ? result : null);
+            };
+        }
+
+        // 2. IParsable<T>: static bool TryParse(string?, IFormatProvider?, out T)
+        var parsable = type.GetMethod(
+            "TryParse",
+            BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy,
+            binder: null,
+            types: [typeof(string), typeof(IFormatProvider), type.MakeByRefType()],
+            modifiers: null);
+
+        if (parsable is not null && parsable.ReturnType == typeof(bool))
+        {
+            return v =>
+            {
+                var args = new object?[] { v, null, null };
+                var ok = (bool) parsable.Invoke(null, args)!;
+                return (ok, ok ? args[2] : null);
+            };
+        }
+
+        // 3. legacy convention: static bool TryParse(string, out T)
+        //    walk the hierarchy so statics declared on a generic base (e.g. SmartEnum<T>) are found.
+        var legacy = FindLegacyTryParse(type);
+        if (legacy is not null)
+        {
+            return v =>
+            {
+                var args = new object?[] { v, null };
+                var ok = (bool) legacy.Invoke(null, args)!;
+                return (ok, ok ? args[1] : null);
+            };
+        }
+
+        return null;
+    }
+
+    private static MethodInfo? FindLegacyTryParse(Type type)
+    {
+        for (var current = type; current is not null && current != typeof(object); current = current.BaseType)
+        {
+            var method = current
+                .GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly)
+                .FirstOrDefault(m =>
+                    m is { Name: "TryParse", ReturnType.Name: nameof(Boolean) }
+                    && m.GetParameters() is [{ } p0, { IsOut: true } p1]
+                    && p0.ParameterType == typeof(string)
+                    && p1.ParameterType.GetElementType() == type);
+
+            if (method is not null)
+            {
+                return method;
+            }
+        }
+
+        return null;
     }
 
     private static Dictionary<Type, Func<string?, (bool Success, object? CastValue, object? DefaultValue)>> TypeParsers { get; } = new()
